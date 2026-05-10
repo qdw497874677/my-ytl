@@ -43,11 +43,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **RELY-02**: User can rerun only failed items from a previous job manifest
 - [ ] **RELY-03**: User can distinguish retryable failures from permanent no-subtitle or unavailable-content outcomes
 - [ ] **RELY-04**: User can skip already completed artifacts without duplicating work
-- [ ] **RELY-05**: User can run an environment preflight check that verifies required downloader dependencies
+- [x] **RELY-05**: User can run an environment preflight check that verifies required downloader dependencies
 
 ### CLI Experience
 
-- [ ] **CLIX-01**: User can run subtitle workflows through a documented CLI command set
+- [x] **CLIX-01**: User can run subtitle workflows through a documented CLI command set
 - [ ] **CLIX-02**: User can see progress and a final success/failure summary for each job
 - [ ] **CLIX-03**: User can request machine-readable summary output for scripting or later API compatibility
 - [x] **CLIX-04**: User can configure output directory and basic job options without editing source code
@@ -119,8 +119,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RELY-02 | Phase 3 | Pending |
 | RELY-03 | Phase 3 | Pending |
 | RELY-04 | Phase 3 | Pending |
-| RELY-05 | Phase 1 | Pending |
-| CLIX-01 | Phase 1 | Pending |
+| RELY-05 | Phase 1 | Complete |
+| CLIX-01 | Phase 1 | Complete |
 | CLIX-02 | Phase 3 | Pending |
 | CLIX-03 | Phase 3 | Pending |
 | CLIX-04 | Phase 1 | Complete |
