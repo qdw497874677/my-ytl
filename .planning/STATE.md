@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-05-10T08:28:43.150Z"
+status: verifying
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-05-10T08:32:20.914Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 Phase: 03 (batch-recovery-automation-readiness) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-10
 
 Progress: [░░░░░░░░░░] 0%
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P01 | 8min | 2 tasks | 3 files |
 | Phase 03 P02 | 12min | 2 tasks | 2 files |
 | Phase 03 P03 | 9min | 2 tasks | 3 files |
+| Phase 03 P04 | 14min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Invoke progress callbacks only after JSONL log append so terminal progress never outruns durable state.
 - [Phase 03]: Rerun reads the saved manifest as the source of truth and does not re-expand playlists.
 - [Phase 03]: Only failed_retryable records are selected; completed, skipped, permanent, and no-subtitle records are preserved.
+- [Phase 03]: Keep CLI handlers thin: commands validate options, delegate to services, then render human or JSON output.
+- [Phase 03]: Separate JSON summary output from Rich rendering so automation never scrapes terminal tables.
 
 ### Pending Todos
 
@@ -90,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-10T08:28:43.146Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-05-10T08:32:20.909Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None
