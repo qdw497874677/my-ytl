@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Intake
 
-- [ ] **INTK-01**: User can submit a single YouTube video URL for subtitle download
-- [ ] **INTK-02**: User can submit a YouTube playlist URL and have the tool expand it into per-video subtitle tasks
-- [ ] **INTK-03**: User can use common YouTube URL variants without manual normalization
-- [ ] **INTK-04**: User can inspect a target before download and see what items/languages are available
+- [x] **INTK-01**: User can submit a single YouTube video URL for subtitle download
+- [x] **INTK-02**: User can submit a YouTube playlist URL and have the tool expand it into per-video subtitle tasks
+- [x] **INTK-03**: User can use common YouTube URL variants without manual normalization
+- [x] **INTK-04**: User can inspect a target before download and see what items/languages are available
 
 ### Subtitles
 
@@ -97,10 +97,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INTK-01 | Phase 1 | Pending |
-| INTK-02 | Phase 1 | Pending |
-| INTK-03 | Phase 1 | Pending |
-| INTK-04 | Phase 1 | Pending |
+| INTK-01 | Phase 1 | Complete |
+| INTK-02 | Phase 1 | Complete |
+| INTK-03 | Phase 1 | Complete |
+| INTK-04 | Phase 1 | Complete |
 | SUBT-01 | Phase 2 | Pending |
 | SUBT-02 | Phase 3 | Pending |
 | SUBT-03 | Phase 2 | Pending |
