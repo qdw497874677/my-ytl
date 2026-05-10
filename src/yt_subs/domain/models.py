@@ -1,4 +1,4 @@
-"""Pydantic domain contracts for inspectable YouTube jobs."""
+"""Pydantic domain contracts for inspectable YouTube jobs and subtitle artifacts."""
 
 from pathlib import Path
 from typing import Literal
@@ -7,6 +7,7 @@ from pydantic import AnyUrl, BaseModel, ConfigDict, Field, field_validator
 
 TargetKind = Literal["auto", "video", "playlist"]
 SubtitleKind = Literal["manual", "automatic"]
+SubtitleFormat = Literal["vtt", "srt", "txt"]
 
 
 class TargetRequest(BaseModel):
@@ -75,3 +76,52 @@ class OutputIdentity(BaseModel):
     subtitles_dir: Path
     logs_dir: Path
     media_dir: Path
+
+
+class SubtitleProvenance(BaseModel):
+    """Records the source track a converted artifact was derived from."""
+
+    model_config = ConfigDict(frozen=True)
+
+    source_path: Path
+    source_format: SubtitleFormat
+    source_language_code: str = Field(min_length=1)
+    source_kind: SubtitleKind
+
+
+class SubtitleArtifact(BaseModel):
+    """A persisted subtitle file with format and provenance."""
+
+    model_config = ConfigDict(frozen=True)
+
+    language_code: str = Field(min_length=1)
+    kind: SubtitleKind
+    format: SubtitleFormat
+    path: Path
+    provenance: SubtitleProvenance
+
+
+class MissingSubtitle(BaseModel):
+    """A requested subtitle language that was unavailable."""
+
+    model_config = ConfigDict(frozen=True)
+
+    language_code: str = Field(min_length=1)
+    reason: Literal["unavailable"]
+    detail: str | None = None
+
+
+class SubtitleDownloadOptions(BaseModel):
+    """User-facing subtitle download options shared by CLI and future API."""
+
+    model_config = ConfigDict(frozen=True)
+
+    output_dir: Path = Path("downloads")
+    languages: list[str] = Field(min_length=1)
+    formats: list[SubtitleFormat] = Field(default=["vtt"])
+    include_automatic: bool = True
+
+    @field_validator("output_dir", mode="before")
+    @classmethod
+    def coerce_output_dir(cls, value: str | Path) -> Path:
+        return Path(value)
