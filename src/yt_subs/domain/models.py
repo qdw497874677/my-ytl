@@ -125,3 +125,30 @@ class SubtitleDownloadOptions(BaseModel):
     @classmethod
     def coerce_output_dir(cls, value: str | Path) -> Path:
         return Path(value)
+
+
+class VideoMetadata(BaseModel):
+    """Normalized metadata persisted alongside subtitle artifacts."""
+
+    model_config = ConfigDict(frozen=True)
+
+    video_id: str = Field(min_length=1)
+    title: str | None = None
+    webpage_url: AnyUrl
+    requested_languages: list[str]
+    requested_formats: list[SubtitleFormat]
+    include_automatic: bool
+    artifacts: list[SubtitleArtifact]
+    missing_languages: list[MissingSubtitle]
+
+
+class SubtitleDownloadResult(BaseModel):
+    """Complete result of a single-video subtitle download."""
+
+    model_config = ConfigDict(frozen=True)
+
+    item: InspectItem
+    identity: OutputIdentity
+    artifacts: list[SubtitleArtifact]
+    missing_subtitles: list[MissingSubtitle]
+    metadata_path: Path
