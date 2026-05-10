@@ -27,7 +27,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **EXPT-01**: User can save subtitle outputs in VTT format
 - [ ] **EXPT-02**: User can save subtitle outputs in SRT format
 - [ ] **EXPT-03**: User can save subtitle outputs in TXT format
-- [ ] **EXPT-04**: User can get deterministic output paths for saved subtitle artifacts
+- [x] **EXPT-04**: User can get deterministic output paths for saved subtitle artifacts
 - [ ] **EXPT-05**: User can retain provenance linking converted subtitle files back to their source track and format
 
 ### Metadata and State
@@ -35,7 +35,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **META-01**: User gets per-video metadata persisted as JSON alongside downloaded artifacts
 - [ ] **META-02**: User gets a job manifest that records requested inputs, expanded items, artifact paths, statuses, and errors
 - [ ] **META-03**: User gets structured download logs for each run
-- [ ] **META-04**: User can identify each saved artifact bundle by a stable item identity that includes the YouTube video ID
+- [x] **META-04**: User can identify each saved artifact bundle by a stable item identity that includes the YouTube video ID
 
 ### Reliability
 
@@ -50,7 +50,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **CLIX-01**: User can run subtitle workflows through a documented CLI command set
 - [ ] **CLIX-02**: User can see progress and a final success/failure summary for each job
 - [ ] **CLIX-03**: User can request machine-readable summary output for scripting or later API compatibility
-- [ ] **CLIX-04**: User can configure output directory and basic job options without editing source code
+- [x] **CLIX-04**: User can configure output directory and basic job options without editing source code
 
 ## v2 Requirements
 
@@ -109,12 +109,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPT-01 | Phase 2 | Pending |
 | EXPT-02 | Phase 2 | Pending |
 | EXPT-03 | Phase 2 | Pending |
-| EXPT-04 | Phase 1 | Pending |
+| EXPT-04 | Phase 1 | Complete |
 | EXPT-05 | Phase 2 | Pending |
 | META-01 | Phase 2 | Pending |
 | META-02 | Phase 3 | Pending |
 | META-03 | Phase 3 | Pending |
-| META-04 | Phase 1 | Pending |
+| META-04 | Phase 1 | Complete |
 | RELY-01 | Phase 3 | Pending |
 | RELY-02 | Phase 3 | Pending |
 | RELY-03 | Phase 3 | Pending |
@@ -123,7 +123,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLIX-01 | Phase 1 | Pending |
 | CLIX-02 | Phase 3 | Pending |
 | CLIX-03 | Phase 3 | Pending |
-| CLIX-04 | Phase 1 | Pending |
+| CLIX-04 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 27 total
