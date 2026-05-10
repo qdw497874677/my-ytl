@@ -3,7 +3,7 @@
 from rich.console import Console
 from rich.table import Table
 
-from yt_subs.domain.models import InspectItem, OutputIdentity
+from yt_subs.domain.models import BatchRunLogEvent, BatchRunSummary, InspectItem, OutputIdentity
 from yt_subs.services.inspect import InspectReport
 from yt_subs.services.preflight import PreflightReport
 from yt_subs.services.subtitles import SubtitleDownloadResult
@@ -85,3 +85,28 @@ def render_subtitle_download_result(result: SubtitleDownloadResult, console: Con
 
     # Metadata path
     console.print(f"\nMetadata: {result.metadata_path}")
+
+
+def render_batch_progress_event(event: BatchRunLogEvent, console: Console) -> None:
+    """Render one normalized batch/rerun progress event without raw model reprs."""
+
+    target = f" [{event.item_video_id}]" if event.item_video_id else ""
+    console.print(f"{event.event}{target}: {event.message}")
+
+
+def render_batch_run_summary(summary: BatchRunSummary, console: Console) -> None:
+    """Render final batch/rerun summary counts and durable artifact paths."""
+
+    table = Table(title="Batch run summary")
+    table.add_column("Metric")
+    table.add_column("Count")
+    table.add_row("Total", str(summary.total))
+    table.add_row("Completed", str(summary.completed))
+    table.add_row("Skipped", str(summary.skipped))
+    table.add_row("No subtitles", str(summary.no_subtitles))
+    table.add_row("Failed retryable", str(summary.failed_retryable))
+    table.add_row("Failed permanent", str(summary.failed_permanent))
+    console.print(table)
+    console.print(f"Manifest: {summary.manifest_path}")
+    console.print(f"Log: {summary.log_path}")
+    console.print(f"Summary: {summary.summary_path}")

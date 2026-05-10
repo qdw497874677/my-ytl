@@ -1,19 +1,26 @@
 """Typer CLI entry point for yt-subs."""
 
-from typing import Annotated, Optional
+import json
+from pathlib import Path
+
+from typing import Annotated
 
 import typer
 from pydantic import ValidationError
 from rich.console import Console
 
-from yt_subs.domain.models import JobOptions, SubtitleDownloadOptions, SubtitleFormat
+from yt_subs.domain.models import JobOptions, SubtitleDownloadOptions
 from yt_subs.interfaces.rendering import (
+    render_batch_progress_event,
+    render_batch_run_summary,
     render_inspect_result,
     render_preflight_report,
     render_subtitle_download_result,
 )
+from yt_subs.services.batch import BatchSubtitleOptions, run_batch_subtitle_job
 from yt_subs.services.inspect import inspect_target
 from yt_subs.services.preflight import run_preflight
+from yt_subs.services.rerun import rerun_failed_items
 from yt_subs.services.subtitles import download_subtitles
 
 HELP_EPILOG = """
@@ -87,10 +94,10 @@ def inspect(
 def download(
     url: str = typer.Argument(..., help="YouTube video URL."),
     language: Annotated[
-        Optional[list[str]], typer.Option("--language", "-l", help="Subtitle language(s).")
+        list[str] | None, typer.Option("--language", "-l", help="Subtitle language(s).")
     ] = None,
     format: Annotated[
-        Optional[list[str]], typer.Option("--format", "-f", help="Output format(s): vtt, srt, txt.")
+        list[str] | None, typer.Option("--format", "-f", help="Output format(s): vtt, srt, txt.")
     ] = None,
     output_dir: str = typer.Option(
         "downloads", "--output-dir", "-o", help="Output directory for artifacts."
@@ -122,3 +129,85 @@ def download(
         raise typer.Exit(code=1) from exc
 
     render_subtitle_download_result(result, console)
+
+
+@app.command(
+    help="Run a resilient playlist subtitle batch job.\n\n"
+    "Examples:\n"
+    "  yt-subdl batch URL --language en --format vtt --format srt --output-dir downloads\n"
+    "  yt-subdl batch URL --json-summary"
+)
+def batch(
+    url: str = typer.Argument(..., help="YouTube video or playlist URL."),
+    language: Annotated[
+        list[str] | None, typer.Option("--language", "-l", help="Subtitle language(s).")
+    ] = None,
+    format: Annotated[
+        list[str] | None, typer.Option("--format", "-f", help="Output format(s): vtt, srt, txt.")
+    ] = None,
+    output_dir: str = typer.Option(
+        "downloads", "--output-dir", "-o", help="Output directory for artifacts."
+    ),
+    include_automatic: bool = typer.Option(
+        True, "--include-automatic/--manual-only", help="Include auto-generated captions."
+    ),
+    json_summary: bool = typer.Option(
+        False, "--json-summary", help="Print machine-readable summary JSON."
+    ),
+) -> None:
+    """Run a playlist-scale subtitle batch job."""
+
+    try:
+        options = BatchSubtitleOptions(
+            output_dir=output_dir,
+            languages=language or ["en"],
+            formats=format or ["vtt"],
+            include_automatic=include_automatic,
+        )
+    except ValidationError as exc:
+        console.print(f"Invalid batch options: {exc}")
+        raise typer.Exit(code=2) from exc
+
+    try:
+        summary = run_batch_subtitle_job(
+            url,
+            options,
+            progress_callback=(None if json_summary else lambda event: render_batch_progress_event(event, console)),
+        )
+    except ValidationError as exc:
+        console.print(f"Batch failed: {exc}")
+        raise typer.Exit(code=1) from exc
+
+    if json_summary:
+        console.print(json.dumps(summary.model_dump(mode="json"), ensure_ascii=False, sort_keys=True))
+    else:
+        render_batch_run_summary(summary, console)
+
+
+@app.command(
+    help="Rerun retryable failures from a saved batch manifest.\n\n"
+    "Examples:\n"
+    "  yt-subdl rerun downloads/batch-jobs/JOB/manifest.json\n"
+    "  yt-subdl rerun MANIFEST_PATH --json-summary"
+)
+def rerun(
+    manifest_path: Path = typer.Argument(..., help="Path to a saved batch manifest JSON."),
+    json_summary: bool = typer.Option(
+        False, "--json-summary", help="Print machine-readable summary JSON."
+    ),
+) -> None:
+    """Rerun only retryable failed items from a saved manifest."""
+
+    try:
+        summary = rerun_failed_items(
+            manifest_path,
+            progress_callback=(None if json_summary else lambda event: render_batch_progress_event(event, console)),
+        )
+    except ValidationError as exc:
+        console.print(f"Rerun failed: {exc}")
+        raise typer.Exit(code=1) from exc
+
+    if json_summary:
+        console.print(json.dumps(summary.model_dump(mode="json"), ensure_ascii=False, sort_keys=True))
+    else:
+        render_batch_run_summary(summary, console)
