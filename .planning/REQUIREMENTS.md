@@ -16,11 +16,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Subtitles
 
-- [ ] **SUBT-01**: User can download subtitles for a single video
+- [x] **SUBT-01**: User can download subtitles for a single video
 - [ ] **SUBT-02**: User can download subtitles for every supported item in a playlist without the entire batch stopping on one failure
-- [ ] **SUBT-03**: User can request one or more subtitle languages in a single run
-- [ ] **SUBT-04**: User can distinguish between manual subtitles and auto-generated subtitles in saved outputs or metadata
-- [ ] **SUBT-05**: User can see when requested subtitle languages are unavailable for a video
+- [x] **SUBT-03**: User can request one or more subtitle languages in a single run
+- [x] **SUBT-04**: User can distinguish between manual subtitles and auto-generated subtitles in saved outputs or metadata
+- [x] **SUBT-05**: User can see when requested subtitle languages are unavailable for a video
 
 ### Export
 
@@ -32,7 +32,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Metadata and State
 
-- [ ] **META-01**: User gets per-video metadata persisted as JSON alongside downloaded artifacts
+- [x] **META-01**: User gets per-video metadata persisted as JSON alongside downloaded artifacts
 - [ ] **META-02**: User gets a job manifest that records requested inputs, expanded items, artifact paths, statuses, and errors
 - [ ] **META-03**: User gets structured download logs for each run
 - [x] **META-04**: User can identify each saved artifact bundle by a stable item identity that includes the YouTube video ID
@@ -101,17 +101,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTK-02 | Phase 1 | Complete |
 | INTK-03 | Phase 1 | Complete |
 | INTK-04 | Phase 1 | Complete |
-| SUBT-01 | Phase 2 | Pending |
+| SUBT-01 | Phase 2 | Complete |
 | SUBT-02 | Phase 3 | Pending |
-| SUBT-03 | Phase 2 | Pending |
-| SUBT-04 | Phase 2 | Pending |
-| SUBT-05 | Phase 2 | Pending |
+| SUBT-03 | Phase 2 | Complete |
+| SUBT-04 | Phase 2 | Complete |
+| SUBT-05 | Phase 2 | Complete |
 | EXPT-01 | Phase 2 | Complete |
 | EXPT-02 | Phase 2 | Complete |
 | EXPT-03 | Phase 2 | Complete |
 | EXPT-04 | Phase 1 | Complete |
 | EXPT-05 | Phase 2 | Complete |
-| META-01 | Phase 2 | Pending |
+| META-01 | Phase 2 | Complete |
 | META-02 | Phase 3 | Pending |
 | META-03 | Phase 3 | Pending |
 | META-04 | Phase 1 | Complete |
