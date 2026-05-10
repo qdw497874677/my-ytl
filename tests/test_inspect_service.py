@@ -52,7 +52,9 @@ def test_adapter_normalizes_single_video_subtitle_tracks(monkeypatch) -> None:
     item = YtDlpInspector().inspect("https://www.youtube.com/watch?v=abc123")[0]
 
     assert item.subtitles == [
-        SubtitleTrack(language_code="en", language_name="English", kind="manual", source_format="vtt"),
+        SubtitleTrack(
+            language_code="en", language_name="English", kind="manual", source_format="vtt"
+        ),
         SubtitleTrack(
             language_code="ja",
             language_name="Japanese",
@@ -99,7 +101,9 @@ def test_inspect_target_returns_items_with_subtitle_tracks(tmp_path: Path) -> No
     from yt_subs.services.inspect import inspect_target
 
     result = inspect_target(
-        "https://www.youtube.com/watch?v=abc123", JobOptions(output_dir=tmp_path), inspector=FakeInspector()
+        "https://www.youtube.com/watch?v=abc123",
+        JobOptions(output_dir=tmp_path),
+        inspector=FakeInspector(),
     )
 
     assert result.items[0].item.subtitles[0].language_code == "en"
@@ -109,7 +113,9 @@ def test_inspect_target_attaches_video_id_based_output_plan(tmp_path: Path) -> N
     from yt_subs.services.inspect import inspect_target
 
     result = inspect_target(
-        "https://www.youtube.com/watch?v=abc123", JobOptions(output_dir=tmp_path), inspector=FakeInspector()
+        "https://www.youtube.com/watch?v=abc123",
+        JobOptions(output_dir=tmp_path),
+        inspector=FakeInspector(),
     )
 
     planned = result.items[0].identity

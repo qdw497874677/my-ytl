@@ -40,7 +40,10 @@ def _normalize_item(info: dict[str, Any], playlist_index: int | None = None) -> 
         title=info.get("title"),
         webpage_url=info.get("webpage_url") or info.get("original_url"),
         playlist_index=playlist_index,
-        subtitles=[*_tracks(info.get("subtitles") or {}, "manual"), *_tracks(info.get("automatic_captions") or {}, "automatic")],
+        subtitles=[
+            *_tracks(info.get("subtitles") or {}, "manual"),
+            *_tracks(info.get("automatic_captions") or {}, "automatic"),
+        ],
     )
 
 
