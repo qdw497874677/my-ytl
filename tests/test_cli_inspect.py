@@ -58,6 +58,42 @@ def test_inspect_command_calls_service_with_output_dir(monkeypatch, tmp_path: Pa
     assert captured == {"url": YOUTUBE_URL, "output_dir": tmp_path}
 
 
+def test_inspect_remote_components_flags_configure_inspector(monkeypatch, tmp_path: Path) -> None:
+    captured = {}
+
+    class FakeInspector:
+        def __init__(self, **kwargs) -> None:
+            captured.update(kwargs)
+
+        def inspect(self, url: str):
+            return []
+
+    monkeypatch.setattr(
+        "yt_subs.infrastructure.yt_dlp_adapter.YtDlpInspector",
+        FakeInspector,
+    )
+    monkeypatch.setattr(
+        cli,
+        "inspect_target",
+        lambda url, options, *, inspector=None: _report(tmp_path),
+    )
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "inspect",
+            YOUTUBE_URL,
+            "--remote-components",
+            "ejs:npm",
+            "--no-remote-components",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["remote_components"] == ["ejs:npm"]
+    assert captured["disable_remote_components"] is True
+
+
 def test_inspect_help_shows_examples_and_preview_purpose() -> None:
     result = CliRunner().invoke(app, ["inspect", "--help"])
 
@@ -134,3 +170,14 @@ def test_playlist_inspect_output_includes_multiple_items(monkeypatch, tmp_path: 
     assert result.exit_code == 0
     assert "abc123" in result.output
     assert "def456" in result.output
+
+
+def test_inspect_help_mentions_auto_cookie_detection_and_zen() -> None:
+    result = CliRunner().invoke(app, ["inspect", "--help"])
+
+    assert result.exit_code == 0
+    assert "auto-detects common browsers" in result.output.lower()
+    assert "firefox-compatible path" in result.output.lower()
+    assert "--remote-components" in result.output
+    assert "--no-remote-components" in result.output
+    assert "ejs:github" in result.output

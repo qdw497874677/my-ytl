@@ -37,13 +37,18 @@ def download_subtitles(
     downloader: DownloaderProto | None = None,
     cookies_from_browser: str | None = None,
     cookies_file: str | None = None,
+    remote_components: list[str] | None = None,
+    disable_remote_components: bool = False,
 ) -> SubtitleDownloadResult:
     """Download subtitles for a single YouTube video and persist artifacts + metadata."""
 
     # Parse and inspect
     parse_target_url(url)
     inspector = inspector or YtDlpInspector(
-        cookies_from_browser=cookies_from_browser, cookies_file=cookies_file
+        cookies_from_browser=cookies_from_browser,
+        cookies_file=cookies_file,
+        remote_components=remote_components,
+        disable_remote_components=disable_remote_components,
     )
     items = inspector.inspect(url)
 
@@ -69,7 +74,10 @@ def download_subtitles(
 
     # Download VTT source files for available languages
     downloader = downloader or YtDlpSubtitleDownloader(
-        cookies_from_browser=cookies_from_browser, cookies_file=cookies_file
+        cookies_from_browser=cookies_from_browser,
+        cookies_file=cookies_file,
+        remote_components=remote_components,
+        disable_remote_components=disable_remote_components,
     )
     available_langs = list(available_by_lang.keys())
     vtt_paths: list = []

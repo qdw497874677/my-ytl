@@ -84,11 +84,15 @@ def test_download_command_calls_service_with_languages_and_formats(
         downloader=None,
         cookies_from_browser=None,
         cookies_file=None,
+        remote_components=None,
+        disable_remote_components=False,
     ):
         captured["url"] = url
         captured["languages"] = options.languages
         captured["formats"] = options.formats
         captured["output_dir"] = options.output_dir
+        captured["remote_components"] = remote_components
+        captured["disable_remote_components"] = disable_remote_components
         return result_data
 
     monkeypatch.setattr(cli, "download_subtitles", fake_download)
@@ -115,6 +119,34 @@ def test_download_command_calls_service_with_languages_and_formats(
     assert captured["languages"] == ["en", "ja"]
     assert captured["formats"] == ["vtt", "txt"]
     assert captured["output_dir"] == tmp_path
+    assert captured["remote_components"] is None
+    assert captured["disable_remote_components"] is False
+
+
+def test_download_command_passes_remote_components_overrides(monkeypatch, tmp_path: Path) -> None:
+    captured = {}
+    result_data = _make_result(tmp_path)
+
+    def fake_download(url: str, options, **kw):
+        captured.update(kw)
+        return result_data
+
+    monkeypatch.setattr(cli, "download_subtitles", fake_download)
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "download",
+            YOUTUBE_URL,
+            "--remote-components",
+            "ejs:npm",
+            "--no-remote-components",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["remote_components"] == ["ejs:npm"]
+    assert captured["disable_remote_components"] is True
 
 
 def test_download_output_includes_artifact_paths_and_metadata(monkeypatch, tmp_path: Path) -> None:
@@ -158,3 +190,9 @@ def test_download_help_includes_language_format_and_examples() -> None:
     assert "--format" in result.output
     assert "--cookies-from-browser" in result.output
     assert "--cookies" in result.output
+    assert "--remote-components" in result.output
+    assert "--no-remote-components" in result.output
+    assert "auto-detects common" in result.output.lower()
+    assert "browsers in platform" in result.output.lower()
+    assert "firefox-compatible path" in result.output.lower()
+    assert "ejs:github" in result.output

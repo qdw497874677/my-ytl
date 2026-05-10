@@ -93,3 +93,55 @@ def test_adapter_include_automatic_false(monkeypatch) -> None:
 
     opts = FakeDownloadYoutubeDL.instances[0].options
     assert opts["writeautomaticsub"] is False
+
+
+def test_downloader_auto_cookie_fallback_tries_browsers_then_plain_download(
+    monkeypatch, tmp_path: Path
+) -> None:
+    class FlakyDownloadYoutubeDL(FakeDownloadYoutubeDL):
+        def download(self, url_list: list[str]) -> int:
+            browser = self.options.get("cookiesfrombrowser", (None, None))[0]
+            if browser is not None:
+                raise RuntimeError(f"cookie lookup failed for {browser}")
+            return super().download(url_list)
+
+    monkeypatch.setattr(yt_dlp_adapter, "YoutubeDL", FlakyDownloadYoutubeDL)
+    monkeypatch.setattr(
+        yt_dlp_adapter,
+        "auto_cookie_browser_order",
+        lambda platform=None: ["firefox", "chrome"],
+    )
+
+    downloader = YtDlpSubtitleDownloader()
+    result = downloader.download_subtitles(
+        "https://www.youtube.com/watch?v=abc123", tmp_path, ["en"]
+    )
+
+    attempted = [
+        instance.options.get("cookiesfrombrowser")
+        for instance in FakeDownloadYoutubeDL.instances
+    ]
+    assert attempted == [
+        ("firefox", None, None, None),
+        ("chrome", None, None, None),
+        None,
+    ]
+    assert result
+
+
+def test_downloader_enables_default_remote_components(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(yt_dlp_adapter, "YoutubeDL", FakeDownloadYoutubeDL)
+
+    downloader = YtDlpSubtitleDownloader()
+    downloader.download_subtitles("https://www.youtube.com/watch?v=abc123", tmp_path, ["en"])
+
+    assert FakeDownloadYoutubeDL.instances[0].options["remote_components"] == ["ejs:github"]
+
+
+def test_downloader_can_disable_remote_components(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(yt_dlp_adapter, "YoutubeDL", FakeDownloadYoutubeDL)
+
+    downloader = YtDlpSubtitleDownloader(disable_remote_components=True)
+    downloader.download_subtitles("https://www.youtube.com/watch?v=abc123", tmp_path, ["en"])
+
+    assert FakeDownloadYoutubeDL.instances[0].options["remote_components"] == []

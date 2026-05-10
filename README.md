@@ -36,6 +36,20 @@ Preview a single video, Shorts/share URL, or playlist-capable YouTube URL:
 uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --output-dir downloads
 ```
 
+When you do **not** pass `--cookies-from-browser` or `--cookies`, `yt-subdl` automatically tries common browser cookies in fallback order. It prefers the Firefox family first, then tries Chrome-family browsers supported on the current platform. Zen browser is adapted through the Firefox-compatible backend, and on macOS it first probes `~/Library/Application Support/zen/profiles.ini` plus `Profiles/*Default (release)` before falling back to any profile that contains `cookies.sqlite`.
+
+When you do **not** pass `--remote-components`, `yt-subdl` now enables `ejs:github` by default so `yt-dlp-ejs` can fetch the recommended remote YouTube component when needed. You can override this by repeating `--remote-components ...`, or disable all remote fetching with `--no-remote-components`.
+
+If auto-detection is not enough, override it explicitly:
+
+```bash
+uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --cookies-from-browser firefox
+uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --cookies-from-browser zen
+uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --cookies /path/to/cookies.txt
+uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --remote-components ejs:github
+uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --no-remote-components
+```
+
 Inspect output includes:
 
 - expanded per-video items for playlists
@@ -65,6 +79,10 @@ Options:
 - `--format` / `-f` — output formats: `vtt`, `srt`, `txt` (repeatable, defaults to `vtt`)
 - `--output-dir` / `-o` — output directory (defaults to `downloads`)
 - `--manual-only` — exclude auto-generated captions (default includes them)
+- `--remote-components` — allow specific yt-dlp remote components; defaults to `ejs:github`
+- `--no-remote-components` — disable all remote component fetching, including the default
+- `--cookies-from-browser` — explicitly choose a browser cookie source; when omitted together with `--cookies`, auto-detection tries Firefox first, then Chrome / Chromium / Edge / Safari where supported
+- `--cookies` — explicitly use a Netscape-format cookies.txt file
 
 Artifact layout:
 
@@ -97,6 +115,9 @@ Batch jobs use the same repeatable options as single-video downloads:
 - `--output-dir` / `-o` — output directory (defaults to `downloads`)
 - `--manual-only` — exclude auto-generated captions (default includes them)
 - `--json-summary` — print a machine-readable JSON summary for scripts
+- `--remote-components` — allow specific yt-dlp remote components; defaults to `ejs:github`
+- `--no-remote-components` — disable all remote component fetching, including the default
+- `--cookies-from-browser` / `--cookies` — same cookie override behavior as `inspect` and `download`; otherwise common browsers are auto-detected in fallback order
 
 Batch output is durable. A single failed item does not stop later items, and state is written before the first item and after every item transition.
 

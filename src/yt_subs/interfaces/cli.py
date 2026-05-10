@@ -40,6 +40,22 @@ app = typer.Typer(
 )
 console = Console(width=160)
 
+COOKIE_HELP_TEXT = (
+    "Browser to extract cookies from (e.g. chrome, firefox, safari). "
+    "If omitted together with --cookies, yt-subdl auto-detects common browsers "
+    "in platform order, preferring Firefox-family first; Zen uses the Firefox-compatible path."
+)
+
+COOKIE_FILE_HELP_TEXT = (
+    "Path to Netscape-format cookies.txt file. "
+    "Use this or --cookies-from-browser to override automatic browser cookie detection."
+)
+
+REMOTE_COMPONENTS_HELP_TEXT = (
+    "Allow yt-dlp to fetch remote components when needed. Repeat to pass multiple values. "
+    "Defaults to ejs:github unless --no-remote-components is set."
+)
+
 
 def _progress_renderer(event: BatchRunLogEvent) -> None:
     render_batch_progress_event(event, console)
@@ -69,7 +85,9 @@ def preflight() -> None:
     help="Preview a YouTube video or playlist before download.\n\n"
     "Examples:\n"
     "  yt-subdl inspect https://www.youtube.com/watch?v=VIDEO --output-dir downloads\n"
-    "  yt-subdl inspect URL --cookies-from-browser chrome"
+    "  yt-subdl inspect URL --remote-components ejs:github\n"
+    "  yt-subdl inspect URL --cookies-from-browser chrome\n"
+    "  yt-subdl inspect URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies"
 )
 def inspect(
     url: str = typer.Argument(..., help="YouTube video, Shorts, share, or playlist URL."),
@@ -82,12 +100,21 @@ def inspect(
     cookies_from_browser: str = typer.Option(
         None,
         "--cookies-from-browser",
-        help="Browser to extract cookies from (e.g. chrome, firefox, safari).",
+        help=COOKIE_HELP_TEXT,
     ),
     cookies: str = typer.Option(
         None,
         "--cookies",
-        help="Path to Netscape-format cookies.txt file.",
+        help=COOKIE_FILE_HELP_TEXT,
+    ),
+    remote_components: Annotated[
+        list[str] | None,
+        typer.Option("--remote-components", help=REMOTE_COMPONENTS_HELP_TEXT),
+    ] = None,
+    no_remote_components: bool = typer.Option(
+        False,
+        "--no-remote-components",
+        help="Disable all remote component fetching, including the default ejs:github.",
     ),
 ) -> None:
     """Preview target items, subtitle availability, and planned output paths."""
@@ -96,7 +123,10 @@ def inspect(
 
     try:
         inspector = YtDlpInspector(
-            cookies_from_browser=cookies_from_browser, cookies_file=cookies
+            cookies_from_browser=cookies_from_browser,
+            cookies_file=cookies,
+            remote_components=remote_components,
+            disable_remote_components=no_remote_components,
         )
         report = inspect_target(url, JobOptions(output_dir=output_dir), inspector=inspector)
     except ValidationError as exc:
@@ -113,8 +143,10 @@ def inspect(
     "Examples:\n"
     '  yt-subdl download "https://www.youtube.com/watch?v=VIDEOID" --language en --language ja\n'
     "  yt-subdl download URL --format vtt --format srt --format txt\n"
+    "  yt-subdl download URL --remote-components ejs:github\n"
     "  yt-subdl download URL --manual-only\n"
-    "  yt-subdl download URL --cookies-from-browser chrome"
+    "  yt-subdl download URL --cookies-from-browser chrome\n"
+    "  yt-subdl download URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies"
 )
 def download(
     url: str = typer.Argument(..., help="YouTube video URL."),
@@ -133,12 +165,21 @@ def download(
     cookies_from_browser: str = typer.Option(
         None,
         "--cookies-from-browser",
-        help="Browser to extract cookies from (e.g. chrome, firefox, safari).",
+        help=COOKIE_HELP_TEXT,
     ),
     cookies: str = typer.Option(
         None,
         "--cookies",
-        help="Path to Netscape-format cookies.txt file.",
+        help=COOKIE_FILE_HELP_TEXT,
+    ),
+    remote_components: Annotated[
+        list[str] | None,
+        typer.Option("--remote-components", help=REMOTE_COMPONENTS_HELP_TEXT),
+    ] = None,
+    no_remote_components: bool = typer.Option(
+        False,
+        "--no-remote-components",
+        help="Disable all remote component fetching, including the default ejs:github.",
     ),
 ) -> None:
     """Download subtitle artifacts for a single video."""
@@ -163,6 +204,8 @@ def download(
             options,
             cookies_from_browser=cookies_from_browser,
             cookies_file=cookies,
+            remote_components=remote_components,
+            disable_remote_components=no_remote_components,
         )
     except ValidationError as exc:
         console.print(f"Download failed: {exc}")
@@ -178,8 +221,10 @@ def download(
     help="Run a resilient playlist subtitle batch job.\n\n"
     "Examples:\n"
     "  yt-subdl batch URL --language en --format vtt --format srt --output-dir downloads\n"
+    "  yt-subdl batch URL --remote-components ejs:github\n"
     "  yt-subdl batch URL --json-summary\n"
-    "  yt-subdl batch URL --cookies-from-browser chrome"
+    "  yt-subdl batch URL --cookies-from-browser chrome\n"
+    "  yt-subdl batch URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies"
 )
 def batch(
     url: str = typer.Argument(..., help="YouTube video or playlist URL."),
@@ -201,12 +246,21 @@ def batch(
     cookies_from_browser: str = typer.Option(
         None,
         "--cookies-from-browser",
-        help="Browser to extract cookies from (e.g. chrome, firefox, safari).",
+        help=COOKIE_HELP_TEXT,
     ),
     cookies: str = typer.Option(
         None,
         "--cookies",
-        help="Path to Netscape-format cookies.txt file.",
+        help=COOKIE_FILE_HELP_TEXT,
+    ),
+    remote_components: Annotated[
+        list[str] | None,
+        typer.Option("--remote-components", help=REMOTE_COMPONENTS_HELP_TEXT),
+    ] = None,
+    no_remote_components: bool = typer.Option(
+        False,
+        "--no-remote-components",
+        help="Disable all remote component fetching, including the default ejs:github.",
     ),
 ) -> None:
     """Run a playlist-scale subtitle batch job."""
@@ -229,7 +283,10 @@ def batch(
         if not json_summary:
             progress_callback = _progress_renderer
         inspector = YtDlpInspector(
-            cookies_from_browser=cookies_from_browser, cookies_file=cookies
+            cookies_from_browser=cookies_from_browser,
+            cookies_file=cookies,
+            remote_components=remote_components,
+            disable_remote_components=no_remote_components,
         )
         summary = run_batch_subtitle_job(
             url,

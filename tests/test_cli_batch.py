@@ -38,6 +38,7 @@ def test_batch_command_passes_options_and_prints_json_summary(monkeypatch, tmp_p
         captured["output_dir"] = options.output_dir
         captured["include_automatic"] = options.include_automatic
         captured["progress_callback"] = progress_callback
+        captured["inspector"] = kwargs.get("inspector")
         return _summary(tmp_path)
 
     monkeypatch.setattr(cli, "run_batch_subtitle_job", fake_batch)
@@ -71,6 +72,7 @@ def test_batch_command_passes_options_and_prints_json_summary(monkeypatch, tmp_p
         "output_dir": tmp_path,
         "include_automatic": False,
         "progress_callback": None,
+        "inspector": captured["inspector"],
     }
 
 
@@ -125,3 +127,47 @@ def test_batch_validation_errors_exit_two(monkeypatch, tmp_path: Path) -> None:
     )
 
     assert result.exit_code == 2
+
+
+def test_batch_help_mentions_auto_cookie_detection_and_zen() -> None:
+    result = CliRunner().invoke(app, ["batch", "--help"])
+
+    assert result.exit_code == 0
+    assert "auto-detects common" in result.output.lower()
+    assert "browsers in platform" in result.output.lower()
+    assert "firefox-compatible path" in result.output.lower()
+    assert "--remote-components" in result.output
+    assert "--no-remote-components" in result.output
+    assert "ejs:github" in result.output
+
+
+def test_batch_command_passes_remote_components_to_inspector(monkeypatch, tmp_path: Path) -> None:
+    captured = {}
+
+    class FakeInspector:
+        def __init__(self, **kwargs) -> None:
+            captured.update(kwargs)
+
+        def inspect(self, url: str):
+            return []
+
+    monkeypatch.setattr(
+        "yt_subs.infrastructure.yt_dlp_adapter.YtDlpInspector",
+        FakeInspector,
+    )
+    monkeypatch.setattr(cli, "run_batch_subtitle_job", lambda *args, **kwargs: _summary(tmp_path))
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "batch",
+            PLAYLIST_URL,
+            "--remote-components",
+            "ejs:npm",
+            "--no-remote-components",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["remote_components"] == ["ejs:npm"]
+    assert captured["disable_remote_components"] is True
