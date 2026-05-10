@@ -176,6 +176,26 @@ def test_custom_remote_components_override_default() -> None:
     assert options["remote_components"] == ["ejs:npm"]
 
 
+def test_network_stability_defaults_match_known_good_cli() -> None:
+    options = yt_dlp_adapter._build_network_stability_options()
+
+    assert options["source_address"] == "0.0.0.0"
+    assert options["retries"] == 5
+    assert options["extractor_retries"] == 5
+
+
+def test_network_stability_can_disable_ipv4_and_override_retries() -> None:
+    options = yt_dlp_adapter._build_network_stability_options(
+        force_ipv4=False,
+        retries=8,
+        extractor_retries=11,
+    )
+
+    assert "source_address" not in options
+    assert options["retries"] == 8
+    assert options["extractor_retries"] == 11
+
+
 def test_resolve_zen_profile_prefers_profiles_ini_default(tmp_path: Path) -> None:
     zen_root = tmp_path / "Library" / "Application Support" / "zen"
     profiles_dir = zen_root / "Profiles"
@@ -248,6 +268,17 @@ def test_inspector_passes_default_remote_components(monkeypatch) -> None:
     YtDlpInspector().inspect("https://www.youtube.com/watch?v=abc123")
 
     assert FakeYoutubeDL.instances[0].options["remote_components"] == ["ejs:github"]
+
+
+def test_inspector_passes_default_network_stability_options(monkeypatch) -> None:
+    FakeYoutubeDL.instances = []
+    monkeypatch.setattr(yt_dlp_adapter, "YoutubeDL", FakeYoutubeDL)
+
+    YtDlpInspector().inspect("https://www.youtube.com/watch?v=abc123")
+
+    assert FakeYoutubeDL.instances[0].options["source_address"] == "0.0.0.0"
+    assert FakeYoutubeDL.instances[0].options["retries"] == 5
+    assert FakeYoutubeDL.instances[0].options["extractor_retries"] == 5
 
 
 def test_inspector_auto_cookie_failure_message_mentions_explicit_flags(monkeypatch) -> None:

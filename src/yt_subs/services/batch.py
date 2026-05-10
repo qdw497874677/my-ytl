@@ -38,6 +38,9 @@ class BatchSubtitleOptions(BaseModel):
     languages: list[str] = Field(default_factory=lambda: ["en"])
     formats: list[SubtitleFormat] = Field(default_factory=lambda: ["vtt"])
     include_automatic: bool = True
+    force_ipv4: bool = True
+    retries: int = Field(default=5, ge=0)
+    extractor_retries: int = Field(default=5, ge=0)
 
 
 def run_batch_subtitle_job(
@@ -213,6 +216,9 @@ def execute_batch_item(
             languages=list(options.languages),
             formats=list(options.formats),
             include_automatic=options.include_automatic,
+            force_ipv4=options.force_ipv4,
+            retries=options.retries,
+            extractor_retries=options.extractor_retries,
         )
         result = (
             downloader_factory(record.item, download_options)
@@ -286,6 +292,9 @@ def _coerce_batch_options(
         languages=list(options.languages),
         formats=list(options.formats),
         include_automatic=options.include_automatic,
+        force_ipv4=options.force_ipv4,
+        retries=options.retries,
+        extractor_retries=options.extractor_retries,
     )
 
 

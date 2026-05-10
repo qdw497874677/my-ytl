@@ -154,6 +154,23 @@ def _build_remote_component_options(
     return {"remote_components": selected}
 
 
+def _build_network_stability_options(
+    *,
+    force_ipv4: bool = True,
+    retries: int = 5,
+    extractor_retries: int = 5,
+) -> dict[str, Any]:
+    """Build yt-dlp retry and IP-family options for more stable requests."""
+
+    options: dict[str, Any] = {
+        "retries": retries,
+        "extractor_retries": extractor_retries,
+    }
+    if force_ipv4:
+        options["source_address"] = "0.0.0.0"
+    return options
+
+
 def _cookie_attempts(
     cookies_from_browser: str | None = None,
     cookies_file: str | Path | None = None,
@@ -214,6 +231,9 @@ class YtDlpInspector:
         cookies_file: str | Path | None = None,
         remote_components: list[str] | None = None,
         disable_remote_components: bool = False,
+        force_ipv4: bool = True,
+        retries: int = 5,
+        extractor_retries: int = 5,
     ) -> None:
         self.ydl_options: dict[str, Any] = {
             "ignoreconfig": True,
@@ -221,6 +241,13 @@ class YtDlpInspector:
             "skip_download": True,
             "ignoreerrors": True,
         }
+        self.ydl_options.update(
+            _build_network_stability_options(
+                force_ipv4=force_ipv4,
+                retries=retries,
+                extractor_retries=extractor_retries,
+            )
+        )
         self.ydl_options.update(
             _build_remote_component_options(remote_components, disable_remote_components)
         )
@@ -258,9 +285,20 @@ class YtDlpSubtitleDownloader:
         cookies_file: str | Path | None = None,
         remote_components: list[str] | None = None,
         disable_remote_components: bool = False,
+        force_ipv4: bool = True,
+        retries: int = 5,
+        extractor_retries: int = 5,
     ) -> None:
-        self._extra_options: dict[str, Any] = _build_remote_component_options(
-            remote_components, disable_remote_components
+        self._extra_options: dict[str, Any] = {}
+        self._extra_options.update(
+            _build_network_stability_options(
+                force_ipv4=force_ipv4,
+                retries=retries,
+                extractor_retries=extractor_retries,
+            )
+        )
+        self._extra_options.update(
+            _build_remote_component_options(remote_components, disable_remote_components)
         )
         if ydl_options:
             self._extra_options.update(ydl_options)

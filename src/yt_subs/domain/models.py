@@ -131,6 +131,9 @@ class SubtitleDownloadOptions(BaseModel):
     languages: list[str] = Field(min_length=1)
     formats: list[SubtitleFormat] = Field(default=["vtt"])
     include_automatic: bool = True
+    force_ipv4: bool = True
+    retries: int = Field(default=5, ge=0)
+    extractor_retries: int = Field(default=5, ge=0)
 
     @field_validator("output_dir", mode="before")
     @classmethod

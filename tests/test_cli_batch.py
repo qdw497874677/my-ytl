@@ -133,12 +133,15 @@ def test_batch_help_mentions_auto_cookie_detection_and_zen() -> None:
     result = CliRunner().invoke(app, ["batch", "--help"])
 
     assert result.exit_code == 0
-    assert "auto-detects common" in result.output.lower()
-    assert "browsers in platform" in result.output.lower()
-    assert "firefox-compatible path" in result.output.lower()
-    assert "--remote-components" in result.output
-    assert "--no-remote-components" in result.output
+    assert "auto-detects" in result.output.lower()
+    assert "common browsers" in result.output.lower()
+    assert "firefox-compati" in result.output.lower()
+    assert "--remote-compone" in result.output
+    assert "--no-remote-comp" in result.output
     assert "ejs:github" in result.output
+    assert "--force-ipv4" in result.output
+    assert "--extractor-retries" in result.output
+    assert "--retries" in result.output
 
 
 def test_batch_command_passes_remote_components_to_inspector(monkeypatch, tmp_path: Path) -> None:
@@ -171,3 +174,53 @@ def test_batch_command_passes_remote_components_to_inspector(monkeypatch, tmp_pa
     assert result.exit_code == 0
     assert captured["remote_components"] == ["ejs:npm"]
     assert captured["disable_remote_components"] is True
+
+
+def test_batch_command_passes_network_stability_to_options_and_inspector(
+    monkeypatch, tmp_path: Path
+) -> None:
+    captured = {}
+
+    class FakeInspector:
+        def __init__(self, **kwargs) -> None:
+            captured["inspector"] = kwargs
+
+        def inspect(self, url: str):
+            return []
+
+    def fake_batch(url: str, options, *, progress_callback=None, **kwargs):
+        captured["options"] = {
+            "force_ipv4": options.force_ipv4,
+            "retries": options.retries,
+            "extractor_retries": options.extractor_retries,
+        }
+        return _summary(tmp_path)
+
+    monkeypatch.setattr(
+        "yt_subs.infrastructure.yt_dlp_adapter.YtDlpInspector",
+        FakeInspector,
+    )
+    monkeypatch.setattr(cli, "run_batch_subtitle_job", fake_batch)
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "batch",
+            PLAYLIST_URL,
+            "--no-force-ipv4",
+            "--retries",
+            "4",
+            "--extractor-retries",
+            "6",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["options"] == {
+        "force_ipv4": False,
+        "retries": 4,
+        "extractor_retries": 6,
+    }
+    assert captured["inspector"]["force_ipv4"] is False
+    assert captured["inspector"]["retries"] == 4
+    assert captured["inspector"]["extractor_retries"] == 6

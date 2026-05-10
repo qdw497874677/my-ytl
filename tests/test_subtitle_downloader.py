@@ -145,3 +145,27 @@ def test_downloader_can_disable_remote_components(monkeypatch, tmp_path: Path) -
     downloader.download_subtitles("https://www.youtube.com/watch?v=abc123", tmp_path, ["en"])
 
     assert FakeDownloadYoutubeDL.instances[0].options["remote_components"] == []
+
+
+def test_downloader_passes_default_network_stability_options(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(yt_dlp_adapter, "YoutubeDL", FakeDownloadYoutubeDL)
+
+    downloader = YtDlpSubtitleDownloader()
+    downloader.download_subtitles("https://www.youtube.com/watch?v=abc123", tmp_path, ["en"])
+
+    opts = FakeDownloadYoutubeDL.instances[0].options
+    assert opts["source_address"] == "0.0.0.0"
+    assert opts["retries"] == 5
+    assert opts["extractor_retries"] == 5
+
+
+def test_downloader_can_override_network_stability_options(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(yt_dlp_adapter, "YoutubeDL", FakeDownloadYoutubeDL)
+
+    downloader = YtDlpSubtitleDownloader(force_ipv4=False, retries=8, extractor_retries=11)
+    downloader.download_subtitles("https://www.youtube.com/watch?v=abc123", tmp_path, ["en"])
+
+    opts = FakeDownloadYoutubeDL.instances[0].options
+    assert "source_address" not in opts
+    assert opts["retries"] == 8
+    assert opts["extractor_retries"] == 11

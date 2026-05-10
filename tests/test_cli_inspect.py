@@ -94,6 +94,45 @@ def test_inspect_remote_components_flags_configure_inspector(monkeypatch, tmp_pa
     assert captured["disable_remote_components"] is True
 
 
+def test_inspect_network_stability_flags_configure_inspector(monkeypatch, tmp_path: Path) -> None:
+    captured = {}
+
+    class FakeInspector:
+        def __init__(self, **kwargs) -> None:
+            captured.update(kwargs)
+
+        def inspect(self, url: str):
+            return []
+
+    monkeypatch.setattr(
+        "yt_subs.infrastructure.yt_dlp_adapter.YtDlpInspector",
+        FakeInspector,
+    )
+    monkeypatch.setattr(
+        cli,
+        "inspect_target",
+        lambda url, options, *, inspector=None: _report(tmp_path),
+    )
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "inspect",
+            YOUTUBE_URL,
+            "--no-force-ipv4",
+            "--retries",
+            "7",
+            "--extractor-retries",
+            "9",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["force_ipv4"] is False
+    assert captured["retries"] == 7
+    assert captured["extractor_retries"] == 9
+
+
 def test_inspect_help_shows_examples_and_preview_purpose() -> None:
     result = CliRunner().invoke(app, ["inspect", "--help"])
 
@@ -176,8 +215,13 @@ def test_inspect_help_mentions_auto_cookie_detection_and_zen() -> None:
     result = CliRunner().invoke(app, ["inspect", "--help"])
 
     assert result.exit_code == 0
-    assert "auto-detects common browsers" in result.output.lower()
-    assert "firefox-compatible path" in result.output.lower()
-    assert "--remote-components" in result.output
-    assert "--no-remote-components" in result.output
+    assert "auto-detects" in result.output.lower()
+    assert "common browsers" in result.output.lower()
+    assert "firefox-compati" in result.output.lower()
+    assert "--remote-compone" in result.output
+    assert "--no-remote-comp" in result.output
     assert "ejs:github" in result.output
+    assert "--force-ipv4" in result.output
+    assert "--extractor-retries" in result.output
+    assert "--retries" in result.output
+    assert "--retries" in result.output

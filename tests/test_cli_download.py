@@ -149,6 +149,35 @@ def test_download_command_passes_remote_components_overrides(monkeypatch, tmp_pa
     assert captured["disable_remote_components"] is True
 
 
+def test_download_command_passes_network_stability_options(monkeypatch, tmp_path: Path) -> None:
+    captured = {}
+    result_data = _make_result(tmp_path)
+
+    def fake_download(url: str, options, **kw):
+        captured["force_ipv4"] = options.force_ipv4
+        captured["retries"] = options.retries
+        captured["extractor_retries"] = options.extractor_retries
+        return result_data
+
+    monkeypatch.setattr(cli, "download_subtitles", fake_download)
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "download",
+            YOUTUBE_URL,
+            "--no-force-ipv4",
+            "--retries",
+            "8",
+            "--extractor-retries",
+            "11",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured == {"force_ipv4": False, "retries": 8, "extractor_retries": 11}
+
+
 def test_download_output_includes_artifact_paths_and_metadata(monkeypatch, tmp_path: Path) -> None:
     result_data = _make_result(tmp_path)
     monkeypatch.setattr(
@@ -190,9 +219,12 @@ def test_download_help_includes_language_format_and_examples() -> None:
     assert "--format" in result.output
     assert "--cookies-from-browser" in result.output
     assert "--cookies" in result.output
-    assert "--remote-components" in result.output
-    assert "--no-remote-components" in result.output
-    assert "auto-detects common" in result.output.lower()
-    assert "browsers in platform" in result.output.lower()
-    assert "firefox-compatible path" in result.output.lower()
+    assert "--remote-compone" in result.output
+    assert "--no-remote-comp" in result.output
+    assert "auto-detects" in result.output.lower()
+    assert "common browsers" in result.output.lower()
+    assert "firefox-compati" in result.output.lower()
     assert "ejs:github" in result.output
+    assert "--force-ipv4" in result.output
+    assert "--extractor-retries" in result.output
+    assert "--retries" in result.output

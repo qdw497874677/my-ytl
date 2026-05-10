@@ -56,6 +56,11 @@ REMOTE_COMPONENTS_HELP_TEXT = (
     "Defaults to ejs:github unless --no-remote-components is set."
 )
 
+NETWORK_HELP_TEXT = (
+    "Network stability defaults match the known-good yt-dlp flow: "
+    "--force-ipv4 --retries 5 --extractor-retries 5."
+)
+
 
 def _progress_renderer(event: BatchRunLogEvent) -> None:
     render_batch_progress_event(event, console)
@@ -87,7 +92,8 @@ def preflight() -> None:
     "  yt-subdl inspect https://www.youtube.com/watch?v=VIDEO --output-dir downloads\n"
     "  yt-subdl inspect URL --remote-components ejs:github\n"
     "  yt-subdl inspect URL --cookies-from-browser chrome\n"
-    "  yt-subdl inspect URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies"
+    "  yt-subdl inspect URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies\n"
+    "  yt-subdl inspect URL --force-ipv4 --retries 5 --extractor-retries 5"
 )
 def inspect(
     url: str = typer.Argument(..., help="YouTube video, Shorts, share, or playlist URL."),
@@ -116,6 +122,18 @@ def inspect(
         "--no-remote-components",
         help="Disable all remote component fetching, including the default ejs:github.",
     ),
+    force_ipv4: bool = typer.Option(
+        True,
+        "--force-ipv4/--no-force-ipv4",
+        help="Force IPv4 network requests. Enabled by default for YouTube stability.",
+    ),
+    retries: int = typer.Option(5, "--retries", min=0, help=NETWORK_HELP_TEXT),
+    extractor_retries: int = typer.Option(
+        5,
+        "--extractor-retries",
+        min=0,
+        help=NETWORK_HELP_TEXT,
+    ),
 ) -> None:
     """Preview target items, subtitle availability, and planned output paths."""
 
@@ -127,6 +145,9 @@ def inspect(
             cookies_file=cookies,
             remote_components=remote_components,
             disable_remote_components=no_remote_components,
+            force_ipv4=force_ipv4,
+            retries=retries,
+            extractor_retries=extractor_retries,
         )
         report = inspect_target(url, JobOptions(output_dir=output_dir), inspector=inspector)
     except ValidationError as exc:
@@ -146,7 +167,8 @@ def inspect(
     "  yt-subdl download URL --remote-components ejs:github\n"
     "  yt-subdl download URL --manual-only\n"
     "  yt-subdl download URL --cookies-from-browser chrome\n"
-    "  yt-subdl download URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies"
+    "  yt-subdl download URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies\n"
+    "  yt-subdl download URL --force-ipv4 --retries 5 --extractor-retries 5"
 )
 def download(
     url: str = typer.Argument(..., help="YouTube video URL."),
@@ -181,6 +203,18 @@ def download(
         "--no-remote-components",
         help="Disable all remote component fetching, including the default ejs:github.",
     ),
+    force_ipv4: bool = typer.Option(
+        True,
+        "--force-ipv4/--no-force-ipv4",
+        help="Force IPv4 network requests. Enabled by default for YouTube stability.",
+    ),
+    retries: int = typer.Option(5, "--retries", min=0, help=NETWORK_HELP_TEXT),
+    extractor_retries: int = typer.Option(
+        5,
+        "--extractor-retries",
+        min=0,
+        help=NETWORK_HELP_TEXT,
+    ),
 ) -> None:
     """Download subtitle artifacts for a single video."""
 
@@ -193,6 +227,9 @@ def download(
             languages=languages,
             formats=[f for f in formats],
             include_automatic=include_automatic,
+            force_ipv4=force_ipv4,
+            retries=retries,
+            extractor_retries=extractor_retries,
         )
     except ValidationError as exc:
         console.print(f"Invalid download options: {exc}")
@@ -224,7 +261,8 @@ def download(
     "  yt-subdl batch URL --remote-components ejs:github\n"
     "  yt-subdl batch URL --json-summary\n"
     "  yt-subdl batch URL --cookies-from-browser chrome\n"
-    "  yt-subdl batch URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies"
+    "  yt-subdl batch URL --cookies-from-browser zen  # Zen uses Firefox-compatible cookies\n"
+    "  yt-subdl batch URL --force-ipv4 --retries 5 --extractor-retries 5"
 )
 def batch(
     url: str = typer.Argument(..., help="YouTube video or playlist URL."),
@@ -262,6 +300,18 @@ def batch(
         "--no-remote-components",
         help="Disable all remote component fetching, including the default ejs:github.",
     ),
+    force_ipv4: bool = typer.Option(
+        True,
+        "--force-ipv4/--no-force-ipv4",
+        help="Force IPv4 network requests. Enabled by default for YouTube stability.",
+    ),
+    retries: int = typer.Option(5, "--retries", min=0, help=NETWORK_HELP_TEXT),
+    extractor_retries: int = typer.Option(
+        5,
+        "--extractor-retries",
+        min=0,
+        help=NETWORK_HELP_TEXT,
+    ),
 ) -> None:
     """Run a playlist-scale subtitle batch job."""
 
@@ -273,6 +323,9 @@ def batch(
             languages=language or ["en"],
             formats=format or ["vtt"],
             include_automatic=include_automatic,
+            force_ipv4=force_ipv4,
+            retries=retries,
+            extractor_retries=extractor_retries,
         )
     except ValidationError as exc:
         console.print(f"Invalid batch options: {exc}")
@@ -287,6 +340,9 @@ def batch(
             cookies_file=cookies,
             remote_components=remote_components,
             disable_remote_components=no_remote_components,
+            force_ipv4=force_ipv4,
+            retries=retries,
+            extractor_retries=extractor_retries,
         )
         summary = run_batch_subtitle_job(
             url,

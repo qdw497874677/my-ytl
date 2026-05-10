@@ -149,3 +149,33 @@ def test_skip_no_subtitles_progress_and_jsonl_logs(tmp_path: Path) -> None:
     assert "item_failed" in events
     assert "job_completed" in events
     assert log_events == events
+
+
+def test_batch_propagates_network_stability_options_to_single_item_downloads(
+    tmp_path: Path,
+) -> None:
+    items = [_item("one", 1)]
+    captured = {}
+
+    def fake_download(item: InspectItem, options):
+        captured["force_ipv4"] = options.force_ipv4
+        captured["retries"] = options.retries
+        captured["extractor_retries"] = options.extractor_retries
+        return _result(item, tmp_path)
+
+    summary = run_batch_subtitle_job(
+        PLAYLIST_URL,
+        BatchSubtitleOptions(
+            output_dir=tmp_path,
+            languages=["en"],
+            formats=["vtt"],
+            force_ipv4=False,
+            retries=7,
+            extractor_retries=9,
+        ),
+        inspector=FakeInspector(items),
+        downloader_factory=fake_download,
+    )
+
+    assert summary.completed == 1
+    assert captured == {"force_ipv4": False, "retries": 7, "extractor_retries": 9}

@@ -49,6 +49,9 @@ def download_subtitles(
         cookies_file=cookies_file,
         remote_components=remote_components,
         disable_remote_components=disable_remote_components,
+        force_ipv4=options.force_ipv4,
+        retries=options.retries,
+        extractor_retries=options.extractor_retries,
     )
     items = inspector.inspect(url)
 
@@ -78,6 +81,9 @@ def download_subtitles(
         cookies_file=cookies_file,
         remote_components=remote_components,
         disable_remote_components=disable_remote_components,
+        force_ipv4=options.force_ipv4,
+        retries=options.retries,
+        extractor_retries=options.extractor_retries,
     )
     available_langs = list(available_by_lang.keys())
     vtt_paths: list = []

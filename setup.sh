@@ -128,12 +128,13 @@ run_preflight() {
     echo ""
     echo "快速开始:"
     echo "  source .venv/bin/activate"
-    echo "  yt-subdl inspect \"https://www.youtube.com/watch?v=VIDEO_ID\" --remote-components ejs:github"
-    echo "  yt-subdl download \"https://www.youtube.com/watch?v=VIDEO_ID\" -l en -f srt"
-    echo "  yt-subdl download \"https://www.youtube.com/watch?v=VIDEO_ID\" --cookies-from-browser zen --remote-components ejs:github"
+    echo "  yt-subdl inspect \"https://www.youtube.com/watch?v=VIDEO_ID\" --remote-components ejs:github --force-ipv4 --retries 5 --extractor-retries 5"
+    echo "  yt-subdl download \"https://www.youtube.com/watch?v=VIDEO_ID\" -l en -f srt --force-ipv4 --retries 5 --extractor-retries 5"
+    echo "  yt-subdl download \"https://www.youtube.com/watch?v=VIDEO_ID\" --cookies-from-browser zen --remote-components ejs:github --force-ipv4 --retries 5 --extractor-retries 5"
     echo ""
     echo "提示: 未显式传 --remote-components 时，默认允许 ejs:github；可用 --no-remote-components 关闭或用 --remote-components 覆盖。"
     echo "提示: 未显式传 --cookies-from-browser / --cookies 时，会自动按常见浏览器顺序尝试读取 cookies；Zen 在 macOS 上优先探测 Firefox 兼容 profiles.ini / Default (release) profile。"
+    echo "提示: 默认启用 --force-ipv4，并将 --retries / --extractor-retries 设为 5；可用 --no-force-ipv4 或显式重试参数覆盖。"
 }
 
 clean() {
@@ -175,8 +176,8 @@ main() {
             echo "  ./setup.sh clean        清理虚拟环境"
             echo ""
             echo "示例:"
-            echo "  ./setup.sh run inspect \"https://www.youtube.com/watch?v=VIDEO_ID\" --remote-components ejs:github"
-            echo "  ./setup.sh run download \"https://www.youtube.com/watch?v=VIDEO_ID\" --cookies-from-browser zen --remote-components ejs:github"
+            echo "  ./setup.sh run inspect \"https://www.youtube.com/watch?v=VIDEO_ID\" --remote-components ejs:github --force-ipv4 --retries 5 --extractor-retries 5"
+            echo "  ./setup.sh run download \"https://www.youtube.com/watch?v=VIDEO_ID\" --cookies-from-browser zen --remote-components ejs:github --force-ipv4 --retries 5 --extractor-retries 5"
             ;;
         *)
             run_cmd "$@"
