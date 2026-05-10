@@ -9,8 +9,6 @@ from yt_subs.domain.models import (
     MissingSubtitle,
     SubtitleArtifact,
     SubtitleDownloadOptions,
-    SubtitleFormat,
-    SubtitleKind,
     SubtitleProvenance,
 )
 
