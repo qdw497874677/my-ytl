@@ -24,11 +24,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Export
 
-- [ ] **EXPT-01**: User can save subtitle outputs in VTT format
-- [ ] **EXPT-02**: User can save subtitle outputs in SRT format
-- [ ] **EXPT-03**: User can save subtitle outputs in TXT format
+- [x] **EXPT-01**: User can save subtitle outputs in VTT format
+- [x] **EXPT-02**: User can save subtitle outputs in SRT format
+- [x] **EXPT-03**: User can save subtitle outputs in TXT format
 - [x] **EXPT-04**: User can get deterministic output paths for saved subtitle artifacts
-- [ ] **EXPT-05**: User can retain provenance linking converted subtitle files back to their source track and format
+- [x] **EXPT-05**: User can retain provenance linking converted subtitle files back to their source track and format
 
 ### Metadata and State
 
@@ -106,11 +106,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUBT-03 | Phase 2 | Pending |
 | SUBT-04 | Phase 2 | Pending |
 | SUBT-05 | Phase 2 | Pending |
-| EXPT-01 | Phase 2 | Pending |
-| EXPT-02 | Phase 2 | Pending |
-| EXPT-03 | Phase 2 | Pending |
+| EXPT-01 | Phase 2 | Complete |
+| EXPT-02 | Phase 2 | Complete |
+| EXPT-03 | Phase 2 | Complete |
 | EXPT-04 | Phase 1 | Complete |
-| EXPT-05 | Phase 2 | Pending |
+| EXPT-05 | Phase 2 | Complete |
 | META-01 | Phase 2 | Pending |
 | META-02 | Phase 3 | Pending |
 | META-03 | Phase 3 | Pending |
