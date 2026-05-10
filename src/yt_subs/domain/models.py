@@ -8,6 +8,17 @@ from pydantic import AnyUrl, BaseModel, ConfigDict, Field, field_validator
 TargetKind = Literal["auto", "video", "playlist"]
 SubtitleKind = Literal["manual", "automatic"]
 SubtitleFormat = Literal["vtt", "srt", "txt"]
+BatchItemStatus = Literal[
+    "pending",
+    "running",
+    "completed",
+    "skipped",
+    "failed_retryable",
+    "failed_permanent",
+    "no_subtitles",
+]
+FailureCategory = Literal["retryable", "permanent"]
+LogLevel = Literal["debug", "info", "warning", "error"]
 
 
 class TargetRequest(BaseModel):
@@ -152,3 +163,79 @@ class SubtitleDownloadResult(BaseModel):
     artifacts: list[SubtitleArtifact]
     missing_subtitles: list[MissingSubtitle]
     metadata_path: Path
+
+
+class FailureRecord(BaseModel):
+    """Machine-readable failure classification for batch and rerun items."""
+
+    model_config = ConfigDict(frozen=True)
+
+    category: FailureCategory
+    code: str = Field(min_length=1)
+    message: str = Field(min_length=1)
+    detail: str | None = None
+
+
+class BatchItemRecord(BaseModel):
+    """Durable status record for one item in a batch subtitle job."""
+
+    model_config = ConfigDict(frozen=True)
+
+    item: InspectItem
+    identity: OutputIdentity
+    status: BatchItemStatus = "pending"
+    artifacts: list[SubtitleArtifact] = Field(default_factory=list)
+    missing_subtitles: list[MissingSubtitle] = Field(default_factory=list)
+    error: FailureRecord | None = None
+    attempts: int = Field(default=0, ge=0)
+    started_at: str | None = None
+    completed_at: str | None = None
+
+
+class BatchJobManifest(BaseModel):
+    """API-ready persisted state for a playlist-scale subtitle batch job."""
+
+    model_config = ConfigDict(frozen=True)
+
+    job_id: str = Field(min_length=1)
+    created_at: str = Field(min_length=1)
+    source_url: AnyUrl
+    output_dir: Path
+    requested_languages: list[str] = Field(default_factory=list)
+    requested_formats: list[SubtitleFormat] = Field(default_factory=list)
+    include_automatic: bool = True
+    manifest_path: Path
+    log_path: Path
+    summary_path: Path
+    items: list[BatchItemRecord] = Field(default_factory=list)
+
+
+class BatchRunLogEvent(BaseModel):
+    """One durable JSONL event emitted during batch or rerun execution."""
+
+    model_config = ConfigDict(frozen=True)
+
+    event: str = Field(min_length=1)
+    timestamp: str = Field(min_length=1)
+    level: LogLevel = "info"
+    message: str = Field(min_length=1)
+    item_video_id: str | None = None
+    details: dict[str, object] = Field(default_factory=dict)
+
+
+class BatchRunSummary(BaseModel):
+    """Stable JSON summary for terminal rendering, scripts, and future APIs."""
+
+    model_config = ConfigDict(frozen=True)
+
+    job_id: str = Field(min_length=1)
+    source_url: AnyUrl
+    total: int = Field(ge=0)
+    completed: int = Field(ge=0)
+    skipped: int = Field(ge=0)
+    failed_retryable: int = Field(ge=0)
+    failed_permanent: int = Field(ge=0)
+    no_subtitles: int = Field(ge=0)
+    manifest_path: Path
+    log_path: Path
+    summary_path: Path
