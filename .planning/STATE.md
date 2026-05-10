@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-05-10T03:25:48.146Z"
+status: executing
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-05-10T08:23:51.570Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 11
+  completed_plans: 8
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-09)
 
 **Core value:** 用户输入 YouTube 地址后，能稳定、可批量地拿到可用的字幕结果，并为后续视频下载和 API 化留下清晰扩展路径。
-**Current focus:** Phase 02 — subtitle-artifact-delivery
+**Current focus:** Phase 03 — batch-recovery-automation-readiness
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 03 (batch-recovery-automation-readiness) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-05-10
 
 Progress: [░░░░░░░░░░] 0%
@@ -58,6 +58,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P01 | 4min | 2 tasks | 6 files |
 | Phase 02 P02 | 7min | 2 tasks | 6 files |
 | Phase 02 P03 | 4min | 2 tasks | 4 files |
+| Phase 03 P01 | 8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - [Phase 1]: Keep v1 CLI-first while preserving clean service boundaries for a later API.
 - [Phase 2]: Prioritize subtitle workflows before any video download implementation.
 - [Phase 3]: Treat manifests, logs, and deterministic artifact layout as product outputs, not internal details.
+- [Phase 03]: Use pure Pydantic domain models for batch records so CLI, rerun, and future API code share one schema.
+- [Phase 03]: Keep durable run logs as JSONL helper output instead of coupling persistence to terminal logging.
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-10T03:24:59.106Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-05-10T08:23:51.566Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
