@@ -102,7 +102,7 @@ def run_batch_subtitle_job(
             progress_callback=progress_callback,
         )
 
-        record = _execute_item(record, batch_options, downloader_factory)
+        record = execute_batch_item(record, batch_options, downloader_factory)
         records[index] = record
         manifest = manifest.model_copy(update={"items": records})
         write_manifest(manifest)
@@ -175,7 +175,7 @@ class _SingleItemInspector:
         return [self._item]
 
 
-def _execute_item(
+def execute_batch_item(
     record: BatchItemRecord,
     options: BatchSubtitleOptions,
     downloader_factory: DownloadCallable | None,
