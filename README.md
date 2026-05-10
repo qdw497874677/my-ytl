@@ -2,7 +2,7 @@
 
 CLI-first YouTube subtitle inspection and download tooling.
 
-Phase 1 focuses on inspectable intake and job setup. It lets you check the local runtime, inspect a YouTube video or playlist, see available subtitle tracks, and preview deterministic output paths before any subtitle files are downloaded.
+Download subtitles for YouTube videos in VTT, SRT, and TXT formats with per-video metadata and provenance tracking.
 
 > The current executable name, `yt-subdl`, is an internal temporary CLI name and may be replaced later without changing the core service boundaries.
 
@@ -43,20 +43,49 @@ Inspect output includes:
 - available subtitle language codes with manual/automatic labels
 - planned output bundle paths under the selected `--output-dir`
 
-## Phase 1 Boundaries
+## Download Subtitles
 
-Implemented now:
+Download subtitle artifacts for a single YouTube video in the languages and formats you need:
 
-- `preflight` runtime readiness checks
-- `inspect` metadata preview and output path planning
-- configurable output directory for inspect/job setup
+```bash
+uv run yt-subdl download "https://www.youtube.com/watch?v=VIDEOID" --language en --language ja --format vtt --format srt --format txt --output-dir downloads
+```
 
-Not implemented in Phase 1:
+Download output includes:
 
-- actual subtitle downloads
-- VTT/SRT/TXT conversion
-- failed-task reruns or manifests
+- subtitle artifact files under `downloads/items/{video_id[-title]}/subtitles/`
+- per-video metadata at `downloads/items/{video_id[-title]}/metadata/item.json`
+- unavailable requested languages reported in CLI output and metadata
+
+VTT is the source subtitle artifact. SRT and TXT are converted exports. Metadata links every converted file to its source track. Unavailable requested languages are reported as structured outcomes, not generic errors.
+
+Options:
+
+- `--language` / `-l` — one or more subtitle languages (repeatable, defaults to `en`)
+- `--format` / `-f` — output formats: `vtt`, `srt`, `txt` (repeatable, defaults to `vtt`)
+- `--output-dir` / `-o` — output directory (defaults to `downloads`)
+- `--manual-only` — exclude auto-generated captions (default includes them)
+
+Artifact layout:
+
+```
+downloads/
+  items/
+    {video_id[-title]}/
+      subtitles/
+        en.manual.vtt
+        en.manual.srt
+        en.manual.txt
+        ja.automatic.vtt
+      metadata/
+        item.json
+      logs/          (reserved for later)
+```
+
+Not implemented yet:
+
+- playlist reruns/manifests and failed-task recovery
 - video download workflows
 - HTTP API mode
 
-Those capabilities are intentionally reserved for later roadmap phases so the CLI/service contracts stay inspectable and stable first.
+Those capabilities are intentionally reserved for later roadmap phases.
