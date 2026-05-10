@@ -1,6 +1,7 @@
-"""Isolated yt-dlp metadata inspection adapter."""
+"""Isolated yt-dlp metadata inspection and subtitle download adapters."""
 
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Any
 
 from yt_dlp import YoutubeDL
@@ -22,6 +23,40 @@ class YtDlpInspector:
             if hasattr(ydl, "sanitize_info"):
                 raw_info = ydl.sanitize_info(raw_info)
         return list(_normalize_info(raw_info))
+
+
+class YtDlpSubtitleDownloader:
+    """Adapter for subtitle-only downloads via yt-dlp."""
+
+    def __init__(self, ydl_options: dict[str, Any] | None = None) -> None:
+        self._extra_options = ydl_options or {}
+
+    def download_subtitles(
+        self,
+        url: str,
+        subtitles_dir: Path,
+        languages: list[str],
+        include_automatic: bool = True,
+    ) -> list[Path]:
+        """Download subtitle VTT files to subtitles_dir and return discovered paths."""
+        subtitles_dir.mkdir(parents=True, exist_ok=True)
+        options: dict[str, Any] = {
+            "ignoreconfig": True,
+            "quiet": True,
+            "skip_download": True,
+            "writesubtitles": True,
+            "writeautomaticsub": include_automatic,
+            "subtitleslangs": languages,
+            "subtitlesformat": "vtt",
+            "outtmpl": {
+                "subtitle": str(subtitles_dir / "%(id)s.%(language)s.%(ext)s"),
+                "default": str(subtitles_dir / "%(id)s.%(ext)s"),
+            },
+        }
+        options.update(self._extra_options)
+        with YoutubeDL(options) as ydl:
+            ydl.download([url])
+        return sorted(subtitles_dir.glob("*.vtt"))
 
 
 def _normalize_info(raw_info: dict[str, Any]) -> Iterable[InspectItem]:
