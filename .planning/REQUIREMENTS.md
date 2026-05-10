@@ -17,7 +17,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Subtitles
 
 - [x] **SUBT-01**: User can download subtitles for a single video
-- [ ] **SUBT-02**: User can download subtitles for every supported item in a playlist without the entire batch stopping on one failure
+- [x] **SUBT-02**: User can download subtitles for every supported item in a playlist without the entire batch stopping on one failure
 - [x] **SUBT-03**: User can request one or more subtitle languages in a single run
 - [x] **SUBT-04**: User can distinguish between manual subtitles and auto-generated subtitles in saved outputs or metadata
 - [x] **SUBT-05**: User can see when requested subtitle languages are unavailable for a video
@@ -39,16 +39,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Reliability
 
-- [ ] **RELY-01**: User can continue batch execution after an individual item fails
+- [x] **RELY-01**: User can continue batch execution after an individual item fails
 - [ ] **RELY-02**: User can rerun only failed items from a previous job manifest
 - [x] **RELY-03**: User can distinguish retryable failures from permanent no-subtitle or unavailable-content outcomes
-- [ ] **RELY-04**: User can skip already completed artifacts without duplicating work
+- [x] **RELY-04**: User can skip already completed artifacts without duplicating work
 - [x] **RELY-05**: User can run an environment preflight check that verifies required downloader dependencies
 
 ### CLI Experience
 
 - [x] **CLIX-01**: User can run subtitle workflows through a documented CLI command set
-- [ ] **CLIX-02**: User can see progress and a final success/failure summary for each job
+- [x] **CLIX-02**: User can see progress and a final success/failure summary for each job
 - [x] **CLIX-03**: User can request machine-readable summary output for scripting or later API compatibility
 - [x] **CLIX-04**: User can configure output directory and basic job options without editing source code
 
@@ -102,7 +102,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTK-03 | Phase 1 | Complete |
 | INTK-04 | Phase 1 | Complete |
 | SUBT-01 | Phase 2 | Complete |
-| SUBT-02 | Phase 3 | Pending |
+| SUBT-02 | Phase 3 | Complete |
 | SUBT-03 | Phase 2 | Complete |
 | SUBT-04 | Phase 2 | Complete |
 | SUBT-05 | Phase 2 | Complete |
@@ -115,13 +115,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | META-02 | Phase 3 | Complete |
 | META-03 | Phase 3 | Complete |
 | META-04 | Phase 1 | Complete |
-| RELY-01 | Phase 3 | Pending |
+| RELY-01 | Phase 3 | Complete |
 | RELY-02 | Phase 3 | Pending |
 | RELY-03 | Phase 3 | Complete |
-| RELY-04 | Phase 3 | Pending |
+| RELY-04 | Phase 3 | Complete |
 | RELY-05 | Phase 1 | Complete |
 | CLIX-01 | Phase 1 | Complete |
-| CLIX-02 | Phase 3 | Pending |
+| CLIX-02 | Phase 3 | Complete |
 | CLIX-03 | Phase 3 | Complete |
 | CLIX-04 | Phase 1 | Complete |
 
