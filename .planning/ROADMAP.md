@@ -62,7 +62,13 @@ Plans:
   3. User can rerun only failed items from a previous manifest, skip already completed artifacts, and avoid duplicating finished work.
   4. User can distinguish retryable failures from permanent no-subtitle or unavailable-content outcomes when reviewing job results.
   5. User can watch progress during execution and request a machine-readable end-of-job summary for automation or future API compatibility.
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 03-batch-recovery-automation-readiness-01-PLAN.md — Define durable batch manifest, structured log, failure taxonomy, and JSON summary contracts.
+- [ ] 03-batch-recovery-automation-readiness-02-PLAN.md — Implement resilient playlist batch execution with continuation, skip-completed behavior, progress events, manifests, and logs.
+- [ ] 03-batch-recovery-automation-readiness-03-PLAN.md — Add manifest-driven rerun of retryable failed items without duplicating completed work.
+- [ ] 03-batch-recovery-automation-readiness-04-PLAN.md — Expose batch/rerun CLI commands, human progress summaries, JSON summaries, and README docs.
 
 ## Progress
 
