@@ -1,8 +1,9 @@
 """Runtime dependency probes for downloader-related tooling."""
 
-from importlib.metadata import PackageNotFoundError, version as package_version
 import shutil
 import subprocess
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as package_version
 
 from yt_subs.services.preflight import PreflightCheck
 
@@ -34,7 +35,9 @@ def _python_package_check() -> PreflightCheck:
             severity="required",
             remediation="Install project dependencies with `uv sync`.",
         )
-    return PreflightCheck(name="yt-dlp", available=True, severity="required", version=detected_version)
+    return PreflightCheck(
+        name="yt-dlp", available=True, severity="required", version=detected_version
+    )
 
 
 def _binary_check(name: str, *, severity: str = "required") -> PreflightCheck:

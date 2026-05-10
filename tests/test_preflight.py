@@ -36,9 +36,13 @@ def test_one_js_runtime_candidate_satisfies_recommended_check(monkeypatch) -> No
     monkeypatch.setattr(
         infra_preflight.shutil,
         "which",
-        lambda name: "/usr/bin/node" if name == "node" else f"/usr/bin/{name}"
-        if name in {"ffmpeg", "ffprobe"}
-        else None,
+        lambda name: (
+            "/usr/bin/node"
+            if name == "node"
+            else f"/usr/bin/{name}"
+            if name in {"ffmpeg", "ffprobe"}
+            else None
+        ),
     )
     monkeypatch.setattr(infra_preflight, "_read_command_version", lambda path: "version-output")
 
