@@ -27,7 +27,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can submit either a single-video URL or a playlist URL, including common YouTube URL variants, without manual normalization.
   3. User can inspect a target and see the expanded items plus available subtitle languages before downloading.
   4. User can set the output directory and basic job options from the CLI and see deterministic item identities and output paths that include the YouTube video ID.
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-inspectable-intake-job-setup-01-PLAN.md — Establish uv project skeleton plus Pydantic domain/output identity contracts.
+- [ ] 01-inspectable-intake-job-setup-02-PLAN.md — Add runtime preflight service and CLI command.
+- [ ] 01-inspectable-intake-job-setup-03-PLAN.md — Implement URL intake plus metadata-only inspect service over yt-dlp adapter.
+- [ ] 01-inspectable-intake-job-setup-04-PLAN.md — Wire standalone inspect CLI rendering and README usage docs.
 
 ### Phase 2: Subtitle Artifact Delivery
 **Goal**: Users can fetch subtitles as durable artifacts in the formats they need, with enough metadata and provenance to trust the outputs.
