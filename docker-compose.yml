@@ -1,0 +1,33 @@
+services:
+  yt-subdl:
+    build: .
+    image: yt-subdl:latest
+    container_name: yt-subdl
+    volumes:
+      # 字幕/元数据输出目录映射到宿主机
+      - ./downloads:/downloads
+      # 可选：挂载 cookies 文件用于 YouTube 认证
+      # - ./cookies.txt:/app/cookies.txt:ro
+    environment:
+      - TZ=Asia/Shanghai
+    # 默认显示帮助；用 docker compose run 覆盖
+    command: ["--help"]
+
+  # ── 使用示例 ──────────────────────────────────
+  # 下载单个视频字幕：
+  #   docker compose run --rm yt-subdl download "https://www.youtube.com/watch?v=VIDEO_ID" -l en -l zh-Hans -f vtt -f srt -f txt
+  #
+  # 检查视频信息：
+  #   docker compose run --rm yt-subdl inspect "https://www.youtube.com/watch?v=VIDEO_ID"
+  #
+  # 批量下载播放列表：
+  #   docker compose run --rm yt-subdl batch "https://www.youtube.com/playlist?list=PLAYLIST_ID" -l en -f srt
+  #
+  # 检查运行时依赖：
+  #   docker compose run --rm yt-subdl preflight
+  #
+  # 重跑失败项：
+  #   docker compose run --rm yt-subdl rerun /downloads/batch-jobs/JOB/manifest.json
+  #
+  # 带 cookies 运行（需先取消上方 volumes 中的 cookies 挂载注释）：
+  #   docker compose run --rm yt-subdl download "URL" -l en -f srt --cookies /app/cookies.txt

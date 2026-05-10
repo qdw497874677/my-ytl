@@ -1,0 +1,14 @@
+.venv/
+.git/
+.github/
+.planning/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+downloads/
+*.md
+!README.md
+LICENSE
+setup.sh
