@@ -36,7 +36,7 @@ Preview a single video, Shorts/share URL, or playlist-capable YouTube URL:
 uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --output-dir downloads
 ```
 
-When you do **not** pass `--cookies-from-browser` or `--cookies`, `yt-subdl` automatically tries common browser cookies in fallback order. It prefers the Firefox family first, then tries Chrome-family browsers supported on the current platform. Zen browser is adapted through the Firefox-compatible backend, and on macOS it first probes `~/Library/Application Support/zen/profiles.ini` plus `Profiles/*Default (release)` before falling back to any profile that contains `cookies.sqlite`.
+When you do **not** pass `--cookies-from-browser` or `--cookies`, `yt-subdl` automatically tries common browser cookies in fallback order. It prefers the Firefox family first, then tries Chrome-family browsers supported on the current platform. Zen browser is handled through yt-dlp's Firefox-compatible cookies backend; on macOS, `zen` resolves to the Zen profile directory under `~/Library/Application Support/zen/...`.
 
 When you do **not** pass `--remote-components`, `yt-subdl` now enables `ejs:github` by default so `yt-dlp-ejs` can fetch the recommended remote YouTube component when needed. You can override this by repeating `--remote-components ...`, or disable all remote fetching with `--no-remote-components`.
 
@@ -90,10 +90,29 @@ Options:
 - `--retries` — yt-dlp request retry count (defaults to `5`)
 - `--extractor-retries` — yt-dlp extractor retry count (defaults to `5`)
 
-Known-good single-video inspect flow, matching the user's validated native yt-dlp setup:
+Known-good single-video inspect flow, matching the validated native yt-dlp setup:
 
 ```bash
 uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" \
+  --cookies-from-browser "firefox:/Users/quandawei/Library/Application Support/zen/Profiles/sif4btp1.Default (release)" \
+  --remote-components ejs:github \
+  --force-ipv4 \
+  --retries 5 \
+  --extractor-retries 5
+```
+
+Equivalent shorthand when Zen auto-detection works on your machine:
+
+```bash
+uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" --cookies-from-browser zen
+```
+
+Known-good download flow with the same validated settings:
+
+```bash
+uv run yt-subdl download "https://www.youtube.com/watch?v=VIDEOID" \
+  --language en \
+  --format vtt \
   --cookies-from-browser "firefox:/Users/quandawei/Library/Application Support/zen/Profiles/sif4btp1.Default (release)" \
   --remote-components ejs:github \
   --force-ipv4 \
@@ -192,3 +211,46 @@ Not implemented yet:
 - HTTP API mode
 
 Those capabilities are intentionally reserved for later roadmap phases.
+
+## 已验证命令 / 故障排查
+
+### 已验证命令
+
+```bash
+# inspect
+uv run yt-subdl inspect "https://www.youtube.com/watch?v=VIDEOID" \
+  --cookies-from-browser "firefox:/Users/you/Library/Application Support/zen/Profiles/<profile>.Default (release)" \
+  --remote-components ejs:github \
+  --force-ipv4 \
+  --retries 5 \
+  --extractor-retries 5
+
+# download
+uv run yt-subdl download "https://www.youtube.com/watch?v=VIDEOID" \
+  --language en \
+  --format vtt \
+  --cookies-from-browser "firefox:/Users/you/Library/Application Support/zen/Profiles/<profile>.Default (release)" \
+  --remote-components ejs:github \
+  --force-ipv4 \
+  --retries 5 \
+  --extractor-retries 5
+```
+
+### 什么时候需要这些参数
+
+- `--remote-components ejs:github`：遇到 YouTube 提取异常，或想和已验证的 `yt-dlp-ejs` 方案完全一致时使用；本 CLI 默认已开启。
+- `--force-ipv4`：当前网络的 IPv6 不稳定、请求卡住、连接偶发失败时使用；本 CLI 默认已开启。
+- `--retries 5`：请求偶发超时、连接被重置、429/5xx 波动时使用；本 CLI 默认值就是 `5`。
+- `--extractor-retries 5`：提取阶段偶发失败、YouTube 临时返回异常时使用；本 CLI 默认值就是 `5`。
+
+### Zen cookies 说明
+
+- macOS 上 Zen 通过 **Firefox-compatible cookies backend** 工作，不是单独的一套 cookies 提取逻辑。
+- 优先尝试 `--cookies-from-browser zen`。
+- 如果自动识别不稳定，改用显式 profile 路径：`firefox:/Users/you/Library/Application Support/zen/Profiles/<profile>.Default (release)`。
+
+### 常见现象
+
+- 出现 impersonation warning：当前已知**不阻塞字幕 inspect/download**；只要仍能列出字幕或成功产出文件，就可以继续使用。
+- 仍然提示登录 / 机器人校验：先确认 Zen 里该视频能正常打开，再重试 `--cookies-from-browser zen` 或显式 profile 路径。
+- 默认命令已经成功：保持默认即可，不必额外堆参数。
