@@ -45,7 +45,12 @@ Plans:
   3. User can tell from saved outputs or metadata whether a subtitle track was manual or auto-generated, and can trace each converted file back to its source track and format.
   4. User can see when a requested subtitle language is unavailable for a video instead of mistaking it for a generic tool failure.
   5. User gets per-video metadata persisted as JSON alongside the downloaded subtitle artifacts.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-subtitle-artifact-delivery-01-PLAN.md — Define subtitle artifact contracts and deterministic VTT/SRT/TXT conversion.
+- [ ] 02-subtitle-artifact-delivery-02-PLAN.md — Implement single-video subtitle download, missing-language reporting, and metadata persistence.
+- [ ] 02-subtitle-artifact-delivery-03-PLAN.md — Expose subtitle download through CLI rendering and README usage docs.
 
 ### Phase 3: Batch Recovery & Automation Readiness
 **Goal**: Users can run playlist-scale subtitle jobs reliably, recover from failures efficiently, and consume durable run records for scripting and later API use.
