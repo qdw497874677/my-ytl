@@ -40,7 +40,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Reliability
 
 - [x] **RELY-01**: User can continue batch execution after an individual item fails
-- [ ] **RELY-02**: User can rerun only failed items from a previous job manifest
+- [x] **RELY-02**: User can rerun only failed items from a previous job manifest
 - [x] **RELY-03**: User can distinguish retryable failures from permanent no-subtitle or unavailable-content outcomes
 - [x] **RELY-04**: User can skip already completed artifacts without duplicating work
 - [x] **RELY-05**: User can run an environment preflight check that verifies required downloader dependencies
@@ -116,7 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | META-03 | Phase 3 | Complete |
 | META-04 | Phase 1 | Complete |
 | RELY-01 | Phase 3 | Complete |
-| RELY-02 | Phase 3 | Pending |
+| RELY-02 | Phase 3 | Complete |
 | RELY-03 | Phase 3 | Complete |
 | RELY-04 | Phase 3 | Complete |
 | RELY-05 | Phase 1 | Complete |

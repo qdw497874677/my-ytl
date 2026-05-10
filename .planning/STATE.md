@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-05-10T08:26:34.057Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-05-10T08:28:43.150Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 ## Current Position
 
 Phase: 03 (batch-recovery-automation-readiness) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-05-10
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P03 | 4min | 2 tasks | 4 files |
 | Phase 03 P01 | 8min | 2 tasks | 3 files |
 | Phase 03 P02 | 12min | 2 tasks | 2 files |
+| Phase 03 P03 | 9min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Keep durable run logs as JSONL helper output instead of coupling persistence to terminal logging.
 - [Phase 03]: Persist manifest state before the first item and after every item transition so interrupted jobs remain recoverable.
 - [Phase 03]: Invoke progress callbacks only after JSONL log append so terminal progress never outruns durable state.
+- [Phase 03]: Rerun reads the saved manifest as the source of truth and does not re-expand playlists.
+- [Phase 03]: Only failed_retryable records are selected; completed, skipped, permanent, and no-subtitle records are preserved.
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-10T08:26:34.053Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-05-10T08:28:43.146Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
