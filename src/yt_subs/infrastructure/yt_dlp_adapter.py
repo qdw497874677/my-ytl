@@ -9,16 +9,38 @@ from yt_dlp import YoutubeDL
 from yt_subs.domain.models import InspectItem, SubtitleTrack
 
 
+def _build_ydl_cookie_options(
+    cookies_from_browser: str | None = None,
+    cookies_file: str | Path | None = None,
+) -> dict[str, Any]:
+    """Build yt-dlp cookie-related options from user-facing CLI flags."""
+    opts: dict[str, Any] = {}
+    if cookies_from_browser:
+        # e.g. "chrome", "firefox", "chrome:profile"
+        parts = cookies_from_browser.split(":", 1)
+        opts["cookiesfrombrowser"] = (parts[0], parts[1] if len(parts) > 1 else None)
+    elif cookies_file:
+        opts["cookiefile"] = str(cookies_file)
+    return opts
+
+
 class YtDlpInspector:
     """Adapter boundary for metadata-only yt-dlp inspection."""
 
-    def __init__(self, ydl_options: dict[str, Any] | None = None) -> None:
-        self.ydl_options = {
+    def __init__(
+        self,
+        ydl_options: dict[str, Any] | None = None,
+        *,
+        cookies_from_browser: str | None = None,
+        cookies_file: str | Path | None = None,
+    ) -> None:
+        self.ydl_options: dict[str, Any] = {
             "ignoreconfig": True,
             "quiet": True,
             "skip_download": True,
             "ignoreerrors": True,
         }
+        self.ydl_options.update(_build_ydl_cookie_options(cookies_from_browser, cookies_file))
         if ydl_options:
             self.ydl_options.update(ydl_options)
 
@@ -35,8 +57,17 @@ class YtDlpInspector:
 class YtDlpSubtitleDownloader:
     """Adapter for subtitle-only downloads via yt-dlp."""
 
-    def __init__(self, ydl_options: dict[str, Any] | None = None) -> None:
-        self._extra_options = ydl_options or {}
+    def __init__(
+        self,
+        ydl_options: dict[str, Any] | None = None,
+        *,
+        cookies_from_browser: str | None = None,
+        cookies_file: str | Path | None = None,
+    ) -> None:
+        self._extra_options: dict[str, Any] = {}
+        self._extra_options.update(_build_ydl_cookie_options(cookies_from_browser, cookies_file))
+        if ydl_options:
+            self._extra_options.update(ydl_options)
 
     def download_subtitles(
         self,

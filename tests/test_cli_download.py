@@ -76,7 +76,15 @@ def test_download_command_calls_service_with_languages_and_formats(
     captured = {}
     result_data = _make_result(tmp_path)
 
-    def fake_download(url: str, options, *, inspector=None, downloader=None):
+    def fake_download(
+        url: str,
+        options,
+        *,
+        inspector=None,
+        downloader=None,
+        cookies_from_browser=None,
+        cookies_file=None,
+    ):
         captured["url"] = url
         captured["languages"] = options.languages
         captured["formats"] = options.formats
@@ -148,3 +156,5 @@ def test_download_help_includes_language_format_and_examples() -> None:
     assert result.exit_code == 0
     assert "--language" in result.output
     assert "--format" in result.output
+    assert "--cookies-from-browser" in result.output
+    assert "--cookies" in result.output

@@ -68,7 +68,8 @@ def preflight() -> None:
 @app.command(
     help="Preview a YouTube video or playlist before download.\n\n"
     "Examples:\n"
-    "  yt-subdl inspect https://www.youtube.com/watch?v=VIDEO --output-dir downloads"
+    "  yt-subdl inspect https://www.youtube.com/watch?v=VIDEO --output-dir downloads\n"
+    "  yt-subdl inspect URL --cookies-from-browser chrome"
 )
 def inspect(
     url: str = typer.Argument(..., help="YouTube video, Shorts, share, or playlist URL."),
@@ -78,14 +79,32 @@ def inspect(
         "-o",
         help="Directory where future artifacts would be planned.",
     ),
+    cookies_from_browser: str = typer.Option(
+        None,
+        "--cookies-from-browser",
+        help="Browser to extract cookies from (e.g. chrome, firefox, safari).",
+    ),
+    cookies: str = typer.Option(
+        None,
+        "--cookies",
+        help="Path to Netscape-format cookies.txt file.",
+    ),
 ) -> None:
     """Preview target items, subtitle availability, and planned output paths."""
 
+    from yt_subs.infrastructure.yt_dlp_adapter import YtDlpInspector
+
     try:
-        report = inspect_target(url, JobOptions(output_dir=output_dir))
+        inspector = YtDlpInspector(
+            cookies_from_browser=cookies_from_browser, cookies_file=cookies
+        )
+        report = inspect_target(url, JobOptions(output_dir=output_dir), inspector=inspector)
     except ValidationError as exc:
         console.print(f"Unsupported URL or options: {exc}")
         raise typer.Exit(code=2) from exc
+    except Exception as exc:
+        console.print(f"[bold red]Inspect failed:[/bold red] {exc}")
+        raise typer.Exit(code=1) from exc
     render_inspect_result(report, console)
 
 
@@ -94,7 +113,8 @@ def inspect(
     "Examples:\n"
     '  yt-subdl download "https://www.youtube.com/watch?v=VIDEOID" --language en --language ja\n'
     "  yt-subdl download URL --format vtt --format srt --format txt\n"
-    "  yt-subdl download URL --manual-only"
+    "  yt-subdl download URL --manual-only\n"
+    "  yt-subdl download URL --cookies-from-browser chrome"
 )
 def download(
     url: str = typer.Argument(..., help="YouTube video URL."),
@@ -109,6 +129,16 @@ def download(
     ),
     include_automatic: bool = typer.Option(
         True, "--include-automatic/--manual-only", help="Include auto-generated captions."
+    ),
+    cookies_from_browser: str = typer.Option(
+        None,
+        "--cookies-from-browser",
+        help="Browser to extract cookies from (e.g. chrome, firefox, safari).",
+    ),
+    cookies: str = typer.Option(
+        None,
+        "--cookies",
+        help="Path to Netscape-format cookies.txt file.",
     ),
 ) -> None:
     """Download subtitle artifacts for a single video."""
@@ -128,7 +158,12 @@ def download(
         raise typer.Exit(code=2) from exc
 
     try:
-        result = download_subtitles(url, options)
+        result = download_subtitles(
+            url,
+            options,
+            cookies_from_browser=cookies_from_browser,
+            cookies_file=cookies,
+        )
     except ValidationError as exc:
         console.print(f"Download failed: {exc}")
         raise typer.Exit(code=1) from exc
@@ -143,7 +178,8 @@ def download(
     help="Run a resilient playlist subtitle batch job.\n\n"
     "Examples:\n"
     "  yt-subdl batch URL --language en --format vtt --format srt --output-dir downloads\n"
-    "  yt-subdl batch URL --json-summary"
+    "  yt-subdl batch URL --json-summary\n"
+    "  yt-subdl batch URL --cookies-from-browser chrome"
 )
 def batch(
     url: str = typer.Argument(..., help="YouTube video or playlist URL."),
@@ -162,8 +198,20 @@ def batch(
     json_summary: bool = typer.Option(
         False, "--json-summary", help="Print machine-readable summary JSON."
     ),
+    cookies_from_browser: str = typer.Option(
+        None,
+        "--cookies-from-browser",
+        help="Browser to extract cookies from (e.g. chrome, firefox, safari).",
+    ),
+    cookies: str = typer.Option(
+        None,
+        "--cookies",
+        help="Path to Netscape-format cookies.txt file.",
+    ),
 ) -> None:
     """Run a playlist-scale subtitle batch job."""
+
+    from yt_subs.infrastructure.yt_dlp_adapter import YtDlpInspector
 
     try:
         options = BatchSubtitleOptions(
@@ -180,9 +228,13 @@ def batch(
         progress_callback = None
         if not json_summary:
             progress_callback = _progress_renderer
+        inspector = YtDlpInspector(
+            cookies_from_browser=cookies_from_browser, cookies_file=cookies
+        )
         summary = run_batch_subtitle_job(
             url,
             options,
+            inspector=inspector,
             progress_callback=progress_callback,
         )
     except ValidationError as exc:

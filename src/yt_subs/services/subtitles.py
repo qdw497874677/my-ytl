@@ -35,12 +35,16 @@ def download_subtitles(
     *,
     inspector: InspectorProto | None = None,
     downloader: DownloaderProto | None = None,
+    cookies_from_browser: str | None = None,
+    cookies_file: str | None = None,
 ) -> SubtitleDownloadResult:
     """Download subtitles for a single YouTube video and persist artifacts + metadata."""
 
     # Parse and inspect
     parse_target_url(url)
-    inspector = inspector or YtDlpInspector()
+    inspector = inspector or YtDlpInspector(
+        cookies_from_browser=cookies_from_browser, cookies_file=cookies_file
+    )
     items = inspector.inspect(url)
 
     if len(items) != 1:
@@ -64,7 +68,9 @@ def download_subtitles(
             missing_subtitles.append(MissingSubtitle(language_code=lang, reason="unavailable"))
 
     # Download VTT source files for available languages
-    downloader = downloader or YtDlpSubtitleDownloader()
+    downloader = downloader or YtDlpSubtitleDownloader(
+        cookies_from_browser=cookies_from_browser, cookies_file=cookies_file
+    )
     available_langs = list(available_by_lang.keys())
     vtt_paths: list = []
     if available_langs:

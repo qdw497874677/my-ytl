@@ -43,7 +43,9 @@ def _report(tmp_path: Path) -> InspectReport:
 def test_inspect_command_calls_service_with_output_dir(monkeypatch, tmp_path: Path) -> None:
     captured = {}
 
-    def fake_inspect_target(url: str, options: JobOptions) -> InspectReport:
+    def fake_inspect_target(
+        url: str, options: JobOptions, *, inspector: object | None = None
+    ) -> InspectReport:
         captured["url"] = url
         captured["output_dir"] = options.output_dir
         return _report(tmp_path)
@@ -72,7 +74,11 @@ def test_invalid_url_validation_is_user_facing() -> None:
 
 
 def test_inspect_output_includes_video_id_and_planned_bundle(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setattr(cli, "inspect_target", lambda url, options: _report(tmp_path))
+    monkeypatch.setattr(
+        cli,
+        "inspect_target",
+        lambda url, options, *, inspector=None: _report(tmp_path),
+    )
 
     result = CliRunner().invoke(app, ["inspect", YOUTUBE_URL, "--output-dir", str(tmp_path)])
 
@@ -82,7 +88,11 @@ def test_inspect_output_includes_video_id_and_planned_bundle(monkeypatch, tmp_pa
 
 
 def test_inspect_output_includes_subtitle_languages_and_kinds(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setattr(cli, "inspect_target", lambda url, options: _report(tmp_path))
+    monkeypatch.setattr(
+        cli,
+        "inspect_target",
+        lambda url, options, *, inspector=None: _report(tmp_path),
+    )
 
     result = CliRunner().invoke(app, ["inspect", YOUTUBE_URL, "--output-dir", str(tmp_path)])
 
@@ -113,7 +123,11 @@ def test_playlist_inspect_output_includes_multiple_items(monkeypatch, tmp_path: 
             ]
         }
     )
-    monkeypatch.setattr(cli, "inspect_target", lambda url, options: report)
+    monkeypatch.setattr(
+        cli,
+        "inspect_target",
+        lambda url, options, *, inspector=None: report,
+    )
 
     result = CliRunner().invoke(app, ["inspect", YOUTUBE_URL, "--output-dir", str(tmp_path)])
 

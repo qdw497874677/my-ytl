@@ -44,6 +44,33 @@ check_python() {
     echo "$python_cmd"
 }
 
+check_deno() {
+    if command -v deno &>/dev/null; then
+        ok "Deno 已安装 ($(deno --version 2>/dev/null | head -1))"
+        return
+    fi
+    info "安装 Deno 运行时 (yt-dlp 需要)..."
+    if command -v curl &>/dev/null && (command -v unzip &>/dev/null || command -v 7z &>/dev/null); then
+        curl -fsSL https://deno.land/install.sh | sh 2>&1
+        export DENO_INSTALL="${DENO_INSTALL:-$HOME/.deno}"
+        export PATH="$DENO_INSTALL/bin:$PATH"
+        # 写入 .venv/bin/activate 以便后续自动加载
+        if [ -f "$VENV_DIR/bin/activate" ]; then
+            cat >> "$VENV_DIR/bin/activate" <<'DENO_RC'
+# Auto-added by yt-subdl setup: Deno runtime for yt-dlp
+if [ -d "$HOME/.deno/bin" ]; then
+    export PATH="$HOME/.deno/bin:$PATH"
+fi
+DENO_RC
+        fi
+        ok "Deno 安装完成"
+    else
+        warn "无法自动安装 Deno (需要 curl + unzip)。"
+        warn "请手动安装: curl -fsSL https://deno.land/install.sh | sh"
+        warn "没有 Deno，yt-dlp 可能无法正常访问 YouTube 视频。"
+    fi
+}
+
 setup_venv() {
     local python_cmd
     python_cmd=$(check_python)
@@ -63,6 +90,8 @@ setup_venv() {
     pip install --upgrade pip --quiet
     pip install -e "$SCRIPT_DIR" --quiet
     ok "依赖安装完成"
+
+    check_deno
 }
 
 run_cmd() {
