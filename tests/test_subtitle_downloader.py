@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-from yt_subs.domain.models import SubtitleTrack
 from yt_subs.infrastructure import yt_dlp_adapter
 from yt_subs.infrastructure.yt_dlp_adapter import YtDlpSubtitleDownloader
 
@@ -29,9 +28,6 @@ class FakeDownloadYoutubeDL:
         # Simulate yt-dlp writing a VTT file based on the subtitle template
         subtitle_tmpl = self._paths_template.get("subtitle", "")
         if subtitle_tmpl:
-            # Write a dummy VTT to simulate yt-dlp output
-            from pathlib import PurePosixPath
-
             vtt_path = Path(substitute_template(subtitle_tmpl, "abc123", "en", "vtt"))
             vtt_path.parent.mkdir(parents=True, exist_ok=True)
             vtt_path.write_text("WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nTest\n", encoding="utf-8")
@@ -40,7 +36,11 @@ class FakeDownloadYoutubeDL:
 
 def substitute_template(template: str, video_id: str, lang: str, ext: str) -> str:
     """Simplistic %(key)s substitution for test purposes."""
-    return template.replace("%(id)s", video_id).replace("%(language)s", lang).replace("%(ext)s", ext)
+    return (
+        template.replace("%(id)s", video_id)
+        .replace("%(language)s", lang)
+        .replace("%(ext)s", ext)
+    )
 
 
 def setup_function():
@@ -87,7 +87,9 @@ def test_adapter_include_automatic_false(monkeypatch) -> None:
     monkeypatch.setattr(yt_dlp_adapter, "YoutubeDL", FakeDownloadYoutubeDL)
     tmp = Path("/tmp/test_subs3")
     downloader = YtDlpSubtitleDownloader()
-    downloader.download_subtitles("https://www.youtube.com/watch?v=abc123", tmp, ["en"], include_automatic=False)
+    downloader.download_subtitles(
+        "https://www.youtube.com/watch?v=abc123", tmp, ["en"], include_automatic=False
+    )
 
     opts = FakeDownloadYoutubeDL.instances[0].options
     assert opts["writeautomaticsub"] is False

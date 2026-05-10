@@ -13,13 +13,20 @@ class YtDlpInspector:
     """Adapter boundary for metadata-only yt-dlp inspection."""
 
     def __init__(self, ydl_options: dict[str, Any] | None = None) -> None:
-        self.ydl_options = {"ignoreconfig": True, "quiet": True, "skip_download": True}
+        self.ydl_options = {
+            "ignoreconfig": True,
+            "quiet": True,
+            "skip_download": True,
+            "ignoreerrors": True,
+        }
         if ydl_options:
             self.ydl_options.update(ydl_options)
 
     def inspect(self, url: str) -> list[InspectItem]:
         with YoutubeDL(self.ydl_options) as ydl:
             raw_info = ydl.extract_info(url, download=False)
+            if raw_info is None:
+                return []
             if hasattr(ydl, "sanitize_info"):
                 raw_info = ydl.sanitize_info(raw_info)
         return list(_normalize_info(raw_info))

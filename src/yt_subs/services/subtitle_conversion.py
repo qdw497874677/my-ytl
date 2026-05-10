@@ -37,7 +37,8 @@ def convert_vtt_artifacts(
     for fmt in requested_formats:
         if fmt == "vtt":
             dest = subtitles_dir / f"{language_code}.{kind}.vtt"
-            shutil.copy2(source_vtt, dest)
+            if source_vtt.resolve() != dest.resolve():
+                shutil.copy2(source_vtt, dest)
         elif fmt == "srt":
             dest = subtitles_dir / f"{language_code}.{kind}.srt"
             _convert_vtt_to_srt(source_vtt, dest)

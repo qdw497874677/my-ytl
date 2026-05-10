@@ -67,15 +67,28 @@ def run_batch_subtitle_job(
         items=[],
     )
 
-    report = inspect_target(
-        url,
-        JobOptions(
-            output_dir=batch_options.output_dir,
-            languages=list(batch_options.languages),
-            include_automatic=batch_options.include_automatic,
-        ),
-        inspector=inspector,
-    )
+    try:
+        report = inspect_target(
+            url,
+            JobOptions(
+                output_dir=batch_options.output_dir,
+                languages=list(batch_options.languages),
+                include_automatic=batch_options.include_automatic,
+            ),
+            inspector=inspector,
+        )
+    except Exception as exc:
+        _log(
+            manifest,
+            "inspection_failed",
+            f"Playlist/video inspection failed: {exc}",
+            level="error",
+            progress_callback=progress_callback,
+        )
+        summary = write_run_summary(manifest)
+        raise PermanentBatchError(
+            f"Failed to inspect target URL: {exc}", code="inspection_failure"
+        ) from exc
     manifest = manifest.model_copy(
         update={
             "items": [

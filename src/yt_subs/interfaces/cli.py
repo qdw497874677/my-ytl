@@ -132,6 +132,9 @@ def download(
     except ValidationError as exc:
         console.print(f"Download failed: {exc}")
         raise typer.Exit(code=1) from exc
+    except Exception as exc:
+        console.print(f"[bold red]Download failed:[/bold red] {exc}")
+        raise typer.Exit(code=1) from exc
 
     render_subtitle_download_result(result, console)
 
@@ -184,6 +187,9 @@ def batch(
         )
     except ValidationError as exc:
         console.print(f"Batch failed: {exc}")
+        raise typer.Exit(code=1) from exc
+    except Exception as exc:
+        console.print(f"[bold red]Batch job failed:[/bold red] {exc}")
         raise typer.Exit(code=1) from exc
 
     if json_summary:
