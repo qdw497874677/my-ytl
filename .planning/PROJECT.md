@@ -13,12 +13,12 @@
 ### Validated
 
 - Phase 1 validated inspectable intake and job setup: users can run CLI preflight, inspect common YouTube video/playlist targets, see available subtitle tracks, and preview deterministic output identities/paths before download.
+- Phase 2 validated subtitle artifact delivery: users can download subtitles for single videos in VTT/SRT/TXT formats, request multiple languages, see unavailable-language outcomes, and get per-video JSON metadata with provenance.
 
 ### Active
 
-- [ ] 用户可以通过单个视频或播放列表 URL 批量下载字幕（Phase 1 已验证 URL intake/inspect；实际下载进入 Phase 2/3）
-- [ ] 用户可以选择一种或多种字幕语言并导出为常见文本格式
-- [ ] 工具会保存元数据、下载日志与任务清单，便于重跑和后续 API 化
+- [ ] 用户可以通过单个视频或播放列表 URL 批量下载字幕（Phase 2 已实现单视频下载；播放列表批量进入 Phase 3）
+- [ ] 工具会保存元数据、下载日志与任务清单，便于重跑和后续 API 化（Phase 2 已实现元数据；日志与任务清单进入 Phase 3）
 
 ### Out of Scope
 
@@ -53,7 +53,7 @@
 | 字幕支持多语言、播放列表批量与格式转换 | 这些是作者定义的第一版“够用”标准 | — Pending |
 | 视频下载延后，但作为后续核心能力规划 | 长期目标不是字幕小工具，而是完整下载器 | — Pending |
 | 技术路线采用成熟下载内核封装 | 降低底层维护成本，把精力放在产品层能力 | — Pending |
-| Phase 1 采用 inspect-first 服务边界 | 先验证 URL intake、metadata inspection 与 deterministic output identity，再进入下载链路 | Validated in Phase 1 |
+| Phase 2 采用 subtitle-first 服务边界 | 先实现字幕下载、格式转换和元数据，再进入批量恢复和自动化 | Validated in Phase 2 |
 
 ## Evolution
 
@@ -73,4 +73,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-10 after Phase 1 completion*
+*Last updated: 2026-05-10 after Phase 2 completion*
