@@ -14,7 +14,6 @@ from yt_subs.domain.models import (
 from yt_subs.services.batch import BatchSubtitleOptions, run_batch_subtitle_job
 from yt_subs.services.job_manifest import read_manifest
 
-
 PLAYLIST_URL = "https://www.youtube.com/playlist?list=PL123"
 
 
@@ -135,9 +134,9 @@ def test_skip_no_subtitles_progress_and_jsonl_logs(tmp_path: Path) -> None:
         progress_callback=lambda event: events.append(event.event),
     )
     manifest = read_manifest(summary.manifest_path)
-    log_events = [
-        json.loads(line)["event"] for line in summary.log_path.read_text(encoding="utf-8").splitlines()
-    ]
+    log_events = [json.loads(line)["event"] for line in summary.log_path.read_text(
+        encoding="utf-8"
+    ).splitlines()]
 
     assert calls == ["fresh"]
     assert summary.skipped == 1

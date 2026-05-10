@@ -17,7 +17,6 @@ from yt_subs.domain.models import (
 from yt_subs.services.job_manifest import read_manifest, write_manifest
 from yt_subs.services.rerun import rerun_failed_items
 
-
 PLAYLIST_URL = "https://www.youtube.com/playlist?list=PL123"
 
 

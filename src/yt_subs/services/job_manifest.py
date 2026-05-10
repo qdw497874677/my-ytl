@@ -47,7 +47,8 @@ def append_run_log(
     )
     manifest.log_path.parent.mkdir(parents=True, exist_ok=True)
     with manifest.log_path.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(log_event.model_dump(mode="json"), ensure_ascii=False, sort_keys=True))
+        line = json.dumps(log_event.model_dump(mode="json"), ensure_ascii=False, sort_keys=True)
+        handle.write(line)
         handle.write("\n")
     return log_event
 

@@ -20,7 +20,6 @@ from yt_subs.services.job_manifest import (
     write_run_summary,
 )
 
-
 YOUTUBE_URL = "https://www.youtube.com/watch?v=abc123"
 
 

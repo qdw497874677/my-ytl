@@ -9,7 +9,6 @@ from yt_subs.domain.models import BatchRunLogEvent, BatchRunSummary
 from yt_subs.interfaces import cli
 from yt_subs.interfaces.cli import app
 
-
 PLAYLIST_URL = "https://www.youtube.com/playlist?list=PL123"
 
 

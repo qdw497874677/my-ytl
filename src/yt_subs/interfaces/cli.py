@@ -2,14 +2,13 @@
 
 import json
 from pathlib import Path
-
 from typing import Annotated
 
 import typer
 from pydantic import ValidationError
 from rich.console import Console
 
-from yt_subs.domain.models import JobOptions, SubtitleDownloadOptions
+from yt_subs.domain.models import BatchRunLogEvent, JobOptions, SubtitleDownloadOptions
 from yt_subs.interfaces.rendering import (
     render_batch_progress_event,
     render_batch_run_summary,
@@ -22,6 +21,8 @@ from yt_subs.services.inspect import inspect_target
 from yt_subs.services.preflight import run_preflight
 from yt_subs.services.rerun import rerun_failed_items
 from yt_subs.services.subtitles import download_subtitles
+
+MANIFEST_PATH_ARGUMENT = typer.Argument(..., help="Path to a saved batch manifest JSON.")
 
 HELP_EPILOG = """
 Examples:
@@ -38,6 +39,10 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 console = Console(width=160)
+
+
+def _progress_renderer(event: BatchRunLogEvent) -> None:
+    render_batch_progress_event(event, console)
 
 
 @app.callback(invoke_without_command=True)
@@ -169,17 +174,23 @@ def batch(
         raise typer.Exit(code=2) from exc
 
     try:
+        progress_callback = None
+        if not json_summary:
+            progress_callback = _progress_renderer
         summary = run_batch_subtitle_job(
             url,
             options,
-            progress_callback=(None if json_summary else lambda event: render_batch_progress_event(event, console)),
+            progress_callback=progress_callback,
         )
     except ValidationError as exc:
         console.print(f"Batch failed: {exc}")
         raise typer.Exit(code=1) from exc
 
     if json_summary:
-        console.print(json.dumps(summary.model_dump(mode="json"), ensure_ascii=False, sort_keys=True))
+        summary_json = json.dumps(
+            summary.model_dump(mode="json"), ensure_ascii=False, sort_keys=True
+        )
+        console.print(summary_json)
     else:
         render_batch_run_summary(summary, console)
 
@@ -191,7 +202,7 @@ def batch(
     "  yt-subdl rerun MANIFEST_PATH --json-summary"
 )
 def rerun(
-    manifest_path: Path = typer.Argument(..., help="Path to a saved batch manifest JSON."),
+    manifest_path: Path = MANIFEST_PATH_ARGUMENT,
     json_summary: bool = typer.Option(
         False, "--json-summary", help="Print machine-readable summary JSON."
     ),
@@ -199,15 +210,21 @@ def rerun(
     """Rerun only retryable failed items from a saved manifest."""
 
     try:
+        progress_callback = None
+        if not json_summary:
+            progress_callback = _progress_renderer
         summary = rerun_failed_items(
             manifest_path,
-            progress_callback=(None if json_summary else lambda event: render_batch_progress_event(event, console)),
+            progress_callback=progress_callback,
         )
     except ValidationError as exc:
         console.print(f"Rerun failed: {exc}")
         raise typer.Exit(code=1) from exc
 
     if json_summary:
-        console.print(json.dumps(summary.model_dump(mode="json"), ensure_ascii=False, sort_keys=True))
+        summary_json = json.dumps(
+            summary.model_dump(mode="json"), ensure_ascii=False, sort_keys=True
+        )
+        console.print(summary_json)
     else:
         render_batch_run_summary(summary, console)

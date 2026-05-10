@@ -15,7 +15,6 @@ from yt_subs.domain.models import (
     FailureRecord,
     InspectItem,
     JobOptions,
-    MissingSubtitle,
     OutputIdentity,
     SubtitleDownloadOptions,
     SubtitleDownloadResult,
@@ -118,7 +117,12 @@ def run_batch_subtitle_job(
         )
 
     summary = write_run_summary(manifest)
-    _log(manifest, "job_completed", "Batch subtitle job completed", progress_callback=progress_callback)
+    _log(
+        manifest,
+        "job_completed",
+        "Batch subtitle job completed",
+        progress_callback=progress_callback,
+    )
     return summary
 
 

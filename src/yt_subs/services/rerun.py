@@ -5,7 +5,12 @@ from pathlib import Path
 
 from yt_subs.domain.models import BatchJobManifest, BatchRunLogEvent, BatchRunSummary
 from yt_subs.services.batch import BatchSubtitleOptions, DownloadCallable, execute_batch_item
-from yt_subs.services.job_manifest import append_run_log, read_manifest, write_manifest, write_run_summary
+from yt_subs.services.job_manifest import (
+    append_run_log,
+    read_manifest,
+    write_manifest,
+    write_run_summary,
+)
 
 ProgressCallback = Callable[[BatchRunLogEvent], None]
 
