@@ -13,8 +13,12 @@ def test_inspect_item_preserves_video_id_and_tracks() -> None:
         title="Example video",
         webpage_url="https://www.youtube.com/watch?v=abc123",
         subtitles=[
-            SubtitleTrack(language_code="en", language_name="English", kind="manual", source_format="vtt"),
-            SubtitleTrack(language_code="ja", language_name="Japanese", kind="automatic", source_format="vtt"),
+            SubtitleTrack(
+                language_code="en", language_name="English", kind="manual", source_format="vtt"
+            ),
+            SubtitleTrack(
+                language_code="ja", language_name="Japanese", kind="automatic", source_format="vtt"
+            ),
         ],
     )
 
@@ -32,7 +36,10 @@ def test_job_options_normalizes_output_dir(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("model", "kwargs"),
     [
-        (InspectItem, {"video_id": "", "title": "No id", "webpage_url": "https://www.youtube.com/watch?v=x"}),
+        (
+            InspectItem,
+            {"video_id": "", "title": "No id", "webpage_url": "https://www.youtube.com/watch?v=x"},
+        ),
         (TargetRequest, {"url": ""}),
     ],
 )
