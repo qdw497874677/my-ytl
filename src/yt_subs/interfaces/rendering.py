@@ -6,6 +6,7 @@ from rich.table import Table
 from yt_subs.domain.models import InspectItem, OutputIdentity
 from yt_subs.services.inspect import InspectReport
 from yt_subs.services.preflight import PreflightReport
+from yt_subs.services.subtitles import SubtitleDownloadResult
 
 
 def render_preflight_report(report: PreflightReport, console: Console) -> None:
@@ -52,3 +53,35 @@ def render_inspect_result(report: InspectReport, console: Console) -> None:
             str(identity.bundle_dir),
         )
     console.print(table)
+
+
+def render_subtitle_download_result(result: SubtitleDownloadResult, console: Console) -> None:
+    """Render subtitle download artifacts and missing-language outcomes."""
+
+    # Artifacts table
+    if result.artifacts:
+        table = Table(title="Subtitle artifacts")
+        table.add_column("Language")
+        table.add_column("Kind")
+        table.add_column("Format")
+        table.add_column("Path")
+        table.add_column("Source")
+
+        for artifact in result.artifacts:
+            table.add_row(
+                artifact.language_code,
+                artifact.kind,
+                artifact.format,
+                str(artifact.path),
+                str(artifact.provenance.source_path),
+            )
+        console.print(table)
+
+    # Missing subtitles
+    if result.missing_subtitles:
+        console.print("\n[bold]Missing subtitles:[/bold]")
+        for missing in result.missing_subtitles:
+            console.print(f"  {missing.language_code}: {missing.reason}")
+
+    # Metadata path
+    console.print(f"\nMetadata: {result.metadata_path}")
